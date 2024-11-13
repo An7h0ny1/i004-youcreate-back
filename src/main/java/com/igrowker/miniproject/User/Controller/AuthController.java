@@ -47,7 +47,7 @@ public class AuthController {
                             schema = @Schema(implementation = AuthLoginRequestDto.class),
                             examples = @ExampleObject(
                                     name = "Login Example",
-                                    value = "{ \"username\": \"user123\", \"password\": \"password123\" }"
+                                    value = "{ \"email\": \"user123\", \"password\": \"password123\" }"
                             )
                     )
             ),
