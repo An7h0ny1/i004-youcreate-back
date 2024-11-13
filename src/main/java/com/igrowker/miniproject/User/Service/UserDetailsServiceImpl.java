@@ -37,9 +37,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
-    private final RoleRepository roleRepository;
+    //private final RoleRepository roleRepository;
 
-    @Override
+    /*@Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByuserName(username).orElseThrow(() -> new UsernameNotFoundException(
                 "El usuario" + username + "no existe"));
@@ -54,14 +54,35 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .flatMap(role -> role.getPermissions().stream())
                 .forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission.getName())));
 
-        return new User(userEntity.getUsername(),
+        return new User(userEntity.getUserName(),
                 userEntity.getPassword(),
                 userEntity.isEnabled(),
                 userEntity.isAccountNoExpired(),
                 userEntity.isCredentialsNoExpired(),
                 userEntity.isAccountNoLocked(),
                 authorities);
+    }*/
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByuserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "El usuario " + username + " no existe"));
+
+        // Construye las autoridades basándose en el único rol del usuario
+        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(userEntity.getRole()));
+
+        return new User(
+                userEntity.getUserName(),
+                userEntity.getPassword(),
+                userEntity.isEnabled(),
+                userEntity.isAccountNoExpired(),
+                userEntity.isCredentialsNoExpired(),
+                userEntity.isAccountNoLocked(),
+                authorities
+        );
     }
+
 
     public AuthResponseDto loginUser(@Valid AuthLoginRequestDto authDto) {
         String username = authDto.username();
@@ -101,9 +122,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     }
 
-    public AuthResponseRegisterDto createUser(AuthCreateUserRequestDto authCreateUserDto) {
+    /*public AuthResponseRegisterDto createUser(AuthCreateUserRequestDto authCreateUserDto) {
 
-        String username = authCreateUserDto.username();
+        String username = authCreateUserDto.userName();
         String password = authCreateUserDto.password();
         String email = authCreateUserDto.email();
 
@@ -120,7 +141,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         UserEntity userEntity = UserEntity.builder()
-                .username(username)
+                .userName(username)
                 .password(passwordEncoder.encode(password))
                 .email(email)
                 .roles(roleEntities)
@@ -148,7 +169,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .forEach(permission -> authoritiesList.add(new SimpleGrantedAuthority(permission.getName())));
         log.debug("User permissions: {}", authoritiesList);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userCreated.getUsername(), userCreated.getPassword(), authoritiesList);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userCreated.getUserName(), userCreated.getPassword(), authoritiesList);
         log.debug("User authentication: {}", authentication);
         String accessToken = jwtUtils.generateJwtToken(authentication);
 
@@ -156,5 +177,46 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         return new AuthResponseRegisterDto(username, "User created successfully", accessToken, true);
         //return new AuthResponseRegisterDto(username, "User created successfully", accessToken, true);
+    }*/
+
+    public AuthResponseRegisterDto createUser(AuthCreateUserRequestDto authCreateUserDto) {
+
+        String username = authCreateUserDto.userName();
+        String password = authCreateUserDto.password();
+        String email = authCreateUserDto.email();
+
+        log.debug("Attempting to create user: username: {}, email: {}", username, email);
+
+        String role = "ROLE_USER";
+
+        UserEntity userEntity = UserEntity.builder()
+                .userName(username)
+                .password(passwordEncoder.encode(password))
+                .email(email)
+                .role(role) // Asigna directamente el rol como un string
+                .isEnabled(true)
+                .accountNoLocked(true)
+                .accountNoExpired(true)
+                .credentialsNoExpired(true)
+                .build();
+
+        log.debug("User entity: {}", userEntity);
+
+        UserEntity userCreated = userRepository.save(userEntity);
+        log.debug("User created: {}", userCreated);
+
+        // Construye las autoridades
+        List<SimpleGrantedAuthority> authoritiesList = new ArrayList<>();
+        authoritiesList.add(new SimpleGrantedAuthority(role));
+        log.debug("User authorities: {}", authoritiesList);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userCreated.getUserName(), userCreated.getPassword(), authoritiesList);
+        log.debug("User authentication: {}", authentication);
+
+        String accessToken = jwtUtils.generateJwtToken(authentication);
+        log.debug("JWT token generated successfully.");
+
+        return new AuthResponseRegisterDto(username, "User created successfully", accessToken, true);
     }
+
 }
