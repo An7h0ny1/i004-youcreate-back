@@ -24,18 +24,19 @@ public class UserController {
     public ResponseEntity<?> getUserProfile(@PathVariable Long id) {
         try {
             if (id <= 0) {
-                UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, "Id de usuario no válido");
+                UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, "El id del usuario debe ser mayor a 0");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
             UserEntity userEntity = userService.getUserProfile(id);
             if (userEntity == null) {
-                UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, "Usuario no encontrado");
+                UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, "Usuario no encontrado");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
-            UserProfileResponseDTO response = new UserProfileResponseDTO(userEntity.getId(), userEntity.getUserName(), userEntity.getEmail(), "Usuario encontrado satisfactoriamente");
+            String country = userEntity.getCountry().toString();
+            UserProfileResponseDTO response = new UserProfileResponseDTO(userEntity.getId(), country, userEntity.getUserName(), userEntity.getEmail(), "Usuario encontrado satisfactoriamente");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, "Hubo un error en el servidor");
+            UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, "Hubo un error en el servidor");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
