@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.User.Model;
 
+import com.igrowker.miniproject.User.Model.Enum.EnumCountry;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,11 @@ public class UserEntity {
     @Column(unique = true)
     private String email;
 
+
     private String role;
+
+    @Enumerated(value = EnumType.STRING)
+    private EnumCountry country;
 
     @Column(name = "is_enabled")
     private boolean isEnabled;
