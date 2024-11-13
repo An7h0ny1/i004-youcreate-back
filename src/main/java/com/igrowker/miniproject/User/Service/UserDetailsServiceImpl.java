@@ -63,17 +63,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 authorities);
     }*/
 
+
+
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByuserName(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(
-                        "El usuario " + username + " no existe"));
+                        "El usuario con el correo " + email + " no existe"));
 
         // Construye las autoridades basándose en el único rol del usuario
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(userEntity.getRole()));
 
         return new User(
-                userEntity.getUserName(),
+                userEntity.getEmail(), // Usar email como identificador
                 userEntity.getPassword(),
                 userEntity.isEnabled(),
                 userEntity.isAccountNoExpired(),
@@ -83,44 +85,42 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         );
     }
 
-
     public AuthResponseDto loginUser(@Valid AuthLoginRequestDto authDto) {
-        String username = authDto.username();
+        String email = authDto.email(); // Usar email como identificador
         String password = authDto.password();
 
-        Long id = userRepository.findByuserName(username)
+        Long id = userRepository.findByEmail(email)
                 .map(UserEntity::getId)
-                .orElseThrow(() -> new UsernameNotFoundException("El Id del usuario " + username + " no existe"));
+                .orElseThrow(() -> new UsernameNotFoundException("El Id del usuario con el correo " + email + " no existe"));
 
-        log.debug("Attempting to authenticate user: {}", username);
+        log.debug("Attempting to authenticate user with email: {}", email);
 
-        try{
-            Authentication authentication = this.authenticate(username, password);
+        try {
+            Authentication authentication = this.authenticate(email, password);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.debug("User authenticated successfully. Generating JWT token.");
             String token = jwtUtils.generateJwtToken(authentication);
             log.debug("JWT token generated successfully.");
-            return new AuthResponseDto(id, username, "User logged successfully", token, true);
-        }
-        catch (Exception e) {
-            log.error("Authentication failed for user: {}", username, e);
+            return new AuthResponseDto(id, email, "User logged successfully", token, true);
+        } catch (Exception e) {
+            log.error("Authentication failed for user with email: {}", email, e);
             throw e;
         }
     }
 
-    public Authentication authenticate(String username, String password) {
-        UserDetails userDetails = loadUserByUsername(username);
-        if(userDetails == null) {
-            throw new BadCredentialsException("Invalid username or password");
+    public Authentication authenticate(String email, String password) {
+        UserDetails userDetails = loadUserByUsername(email);
+        if (userDetails == null) {
+            throw new BadCredentialsException("Invalid email or password");
         }
 
-        if(!passwordEncoder.matches(password, userDetails.getPassword())) {
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Invalid password");
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
-
     }
+
 
     /*public AuthResponseRegisterDto createUser(AuthCreateUserRequestDto authCreateUserDto) {
 
