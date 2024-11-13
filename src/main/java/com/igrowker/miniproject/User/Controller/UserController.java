@@ -2,6 +2,7 @@ package com.igrowker.miniproject.User.Controller;
 
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Model.UserEntity;
+import com.igrowker.miniproject.User.Model.Enum.EnumCountry;
 import com.igrowker.miniproject.User.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class UserController {
                 UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, "Usuario no encontrado");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
-            String country = userEntity.getCountry().toString();
+            String country = EnumCountry.COLOMBIA.toString();
             UserProfileResponseDTO response = new UserProfileResponseDTO(userEntity.getId(), country, userEntity.getUserName(), userEntity.getEmail(), "Usuario encontrado satisfactoriamente");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
