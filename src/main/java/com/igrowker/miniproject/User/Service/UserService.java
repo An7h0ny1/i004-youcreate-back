@@ -13,7 +13,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public void saveUser(UserEntity userEntity){
+        userRepository.save(userEntity);
+    }
+
     public UserEntity getUserProfile(Long id){
         return userRepository.findById(id).orElse(null);
     }
+
 }
