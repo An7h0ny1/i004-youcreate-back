@@ -1,13 +1,12 @@
 package com.igrowker.miniproject.User.Service;
 
 import com.igrowker.miniproject.Config.Jwt.JwtUtils;
+import com.igrowker.miniproject.User.Exception.PasswordMismatchException;
 import com.igrowker.miniproject.User.Dto.AuthCreateUserRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthLoginRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseRegisterDto;
-import com.igrowker.miniproject.User.Model.Role;
 import com.igrowker.miniproject.User.Model.UserEntity;
-import com.igrowker.miniproject.User.Repository.RoleRepository;
 import com.igrowker.miniproject.User.Repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
@@ -75,7 +73,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(userEntity.getRole()));
 
         return new User(
-                userEntity.getEmail(), // Usar email como identificador
+                userEntity.getEmail(),
                 userEntity.getPassword(),
                 userEntity.isEnabled(),
                 userEntity.isAccountNoExpired(),
@@ -86,8 +84,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public AuthResponseDto loginUser(@Valid AuthLoginRequestDto authDto) {
-        String email = authDto.email(); // Usar email como identificador
-        String password = authDto.password();
+        String email = authDto.getEmail(); // Usar email como identificador
+        String password = authDto.getPassword();
 
         Long id = userRepository.findByEmail(email)
                 .map(UserEntity::getId)
@@ -101,7 +99,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             log.debug("User authenticated successfully. Generating JWT token.");
             String token = jwtUtils.generateJwtToken(authentication);
             log.debug("JWT token generated successfully.");
-            return new AuthResponseDto(id, email, "User logged successfully", token, true);
+            return new AuthResponseDto(id, email, "Usuario autenticado correctamente", token, true);
         } catch (Exception e) {
             log.error("Authentication failed for user with email: {}", email, e);
             throw e;
@@ -109,17 +107,24 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public Authentication authenticate(String email, String password) {
+
         UserDetails userDetails = loadUserByUsername(email);
+
         if (userDetails == null) {
-            throw new BadCredentialsException("Invalid email or password");
+            throw new UsernameNotFoundException("El email '" + email + "' no existe.");
         }
 
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Invalid password");
+            throw new BadCredentialsException("La contraseña del correo '" + email + "' es incorrecta.");
         }
 
-        return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                userDetails.getPassword(),
+                userDetails.getAuthorities()
+        );
     }
+
 
 
     /*public AuthResponseRegisterDto createUser(AuthCreateUserRequestDto authCreateUserDto) {
@@ -181,9 +186,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public AuthResponseRegisterDto createUser(AuthCreateUserRequestDto authCreateUserDto) {
 
-        String username = authCreateUserDto.userName();
-        String password = authCreateUserDto.password();
-        String email = authCreateUserDto.email();
+        String username = authCreateUserDto.getUserName();
+        String lastName = authCreateUserDto.getLastName();
+        String password = authCreateUserDto.getPassword();
+        String country = authCreateUserDto.getCountry();
+        String phoneNumber = authCreateUserDto.getPhoneNumber();
+        String email = authCreateUserDto.getEmail();
+
+        String confirmPassword = authCreateUserDto.getConfirmPassword();
+
+        log.debug("confirm password: {}", confirmPassword);
+
+        if (!password.equals(confirmPassword)) {
+            log.debug("Las contraseñas no coinciden");
+            throw new PasswordMismatchException("Las contraseñas no coinciden");
+        }
+
+        log.debug("password: {}", password);
 
         log.debug("Attempting to create user: username: {}, email: {}", username, email);
 
@@ -191,9 +210,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         UserEntity userEntity = UserEntity.builder()
                 .userName(username)
+                .lastName(lastName)
                 .password(passwordEncoder.encode(password))
+                .country(country)
+                .phoneNumber(phoneNumber)
                 .email(email)
-                .role(role) // Asigna directamente el rol como un string
+                .role(role)
                 .isEnabled(true)
                 .accountNoLocked(true)
                 .accountNoExpired(true)
@@ -216,7 +238,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         String accessToken = jwtUtils.generateJwtToken(authentication);
         log.debug("JWT token generated successfully.");
 
-        return new AuthResponseRegisterDto(username, "User created successfully", accessToken, true);
+        return new AuthResponseRegisterDto(username, "Usuario creado exitosamente", accessToken, true);
     }
 
 }

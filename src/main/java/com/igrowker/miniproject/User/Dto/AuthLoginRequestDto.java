@@ -2,7 +2,19 @@ package com.igrowker.miniproject.User.Dto;
 
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record AuthLoginRequestDto(@NotBlank(message = "Username is required") String email,
-                                  @NotBlank(message = "Password is required") String password) {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class AuthLoginRequestDto {
+
+    @NotBlank(message = "El email es requerido")
+    private String email;
+    @NotBlank(message = "La contraseña es requerida")
+    private String password;
 }
