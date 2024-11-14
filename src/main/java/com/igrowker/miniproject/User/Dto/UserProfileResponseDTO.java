@@ -9,6 +9,5 @@ public record UserProfileResponseDTO(
         String username,
         String email,
         String message
-
 ) {
 }
