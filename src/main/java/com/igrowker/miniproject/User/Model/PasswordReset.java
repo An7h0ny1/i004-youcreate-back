@@ -1,6 +1,7 @@
-package com.igrowker.miniproject.PasswordRecovery.Model;
+package com.igrowker.miniproject.User.Model;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,8 +22,8 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "passwordRecovery")
-public class PasswordRecovery {
+@Table(name = "passwordReset")
+public class PasswordReset {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,9 +31,12 @@ public class PasswordRecovery {
 
     @Column(nullable = false)
     private String email;
-    @Column(nullable = false)
-    private String token;
 
     @Column(nullable = false)
-    private Date date;
+    private UUID token;
+
+    @Column(nullable = false)
+    private LocalDateTime created_at;
+
+    private LocalDateTime expired_at;
 }

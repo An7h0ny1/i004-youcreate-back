@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.User.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.igrowker.miniproject.User.Model.Enum.EnumCountry;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,10 +23,11 @@ public class UserEntity {
     @Column(unique = true)
     private String userName;
 
-
+    @JsonProperty("password")
     private String password;
 
     @Column(unique = true)
+    @JsonProperty("email")
     private String email;
 
 
