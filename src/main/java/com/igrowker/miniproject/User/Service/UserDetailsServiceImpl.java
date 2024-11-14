@@ -102,7 +102,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             log.debug("User authenticated successfully. Generating JWT token.");
             String token = jwtUtils.generateJwtToken(authentication);
             log.debug("JWT token generated successfully.");
-            return new AuthResponseDto(id, email, "User logged successfully", token, true);
+            return new AuthResponseDto(id, email, "Usuario autenticado correctamente", token, true);
         } catch (Exception e) {
             log.error("Authentication failed for user with email: {}", email, e);
             throw e;
@@ -193,6 +193,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         String lastName = authCreateUserDto.getLastName();
         String password = authCreateUserDto.getPassword();
         String country = authCreateUserDto.getCountry();
+        String phoneNumber = authCreateUserDto.getPhoneNumber();
         String email = authCreateUserDto.getEmail();
 
         String confirmPassword = authCreateUserDto.getConfirmPassword();
@@ -215,6 +216,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .lastName(lastName)
                 .password(passwordEncoder.encode(password))
                 .country(country)
+                .phoneNumber(phoneNumber)
                 .email(email)
                 .role(role)
                 .isEnabled(true)
@@ -239,7 +241,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         String accessToken = jwtUtils.generateJwtToken(authentication);
         log.debug("JWT token generated successfully.");
 
-        return new AuthResponseRegisterDto(username, "User created successfully", accessToken, true);
+        return new AuthResponseRegisterDto(username, "Usuario creado exitosamente", accessToken, true);
     }
 
 }

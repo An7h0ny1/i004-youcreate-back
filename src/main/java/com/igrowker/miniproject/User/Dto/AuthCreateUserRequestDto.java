@@ -19,6 +19,8 @@ public class AuthCreateUserRequestDto {
     private String userName;
     @NotBlank(message = "El Apellido es requerido")
     private String lastName;
+    @NotBlank(message = "El numero de telefono es requerido")
+    private String phoneNumber;
     @NotBlank(message = "La contraseña es requerida")
     private String password;
     @NotBlank(message = "La confirmacion de la contraseña es requerida")
