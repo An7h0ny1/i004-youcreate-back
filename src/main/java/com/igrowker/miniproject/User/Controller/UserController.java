@@ -3,18 +3,24 @@ package com.igrowker.miniproject.User.Controller;
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
 
     private final UserService userService;
+
+    @Autowired
+    private UserService profilePhotoService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -37,6 +43,22 @@ public class UserController {
         } catch (Exception e) {
             UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, "Hubo un error en el servidor");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Upload a profile photo")
+    @PostMapping(value = "/update-photo", consumes = "multipart/form-data")
+    public ResponseEntity<String> updateProfilePhoto(
+            @Parameter(description = "Profile photo file", required = true)
+            @RequestParam("photo") MultipartFile photo) {
+        try {
+            // Llama al servicio para guardar la foto.
+            String filePath = profilePhotoService.saveProfilePhoto(photo);
+
+            // Devuelve la ruta donde se guardó la foto (esto podría cambiarse para devolver una URL)
+            return ResponseEntity.ok("Profile photo updated. Saved at: " + filePath);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Failed to upload photo: " + e.getMessage());
         }
     }
 }

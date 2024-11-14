@@ -31,6 +31,8 @@ public class UserEntity {
 
     private String role;
 
+    private String profilePhotoPath;
+
     @Enumerated(value = EnumType.STRING)
     private EnumCountry country;
 
