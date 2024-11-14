@@ -3,7 +3,7 @@ package com.igrowker.miniproject.User.Controller;
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
 import com.igrowker.miniproject.User.Model.UserEntity;
-import com.igrowker.miniproject.User.Model.Enum.EnumCountry;
+//import com.igrowker.miniproject.User.Model.Enum.EnumCountry;
 import com.igrowker.miniproject.User.Service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +35,7 @@ public class UserController {
                 UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, "Usuario no encontrado");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
-            String country = EnumCountry.COLOMBIA.toString();
+            String country = userEntity.getCountry();
             UserProfileResponseDTO response = new UserProfileResponseDTO(userEntity.getId(), country, userEntity.getUserName(), userEntity.getEmail(), "Usuario encontrado satisfactoriamente");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class UserController {
             userEntity.setEmail(request.getEmail());
             userService.saveUser(userEntity);
 
-            return ResponseEntity.ok(new UserProfileResponseDTO(userEntity.getId(), EnumCountry.COLOMBIA.toString(), userEntity.getUserName(), userEntity.getEmail(), "Usuario actualizado satisfactoriamente"));
+            return ResponseEntity.ok(new UserProfileResponseDTO(userEntity.getId(), userEntity.getCountry(), userEntity.getUserName(), userEntity.getEmail(), "Usuario actualizado satisfactoriamente"));
         } catch (Exception e) {
             return buildErrorResponse("Hubo un error en el servidor", HttpStatus.INTERNAL_SERVER_ERROR);
         }

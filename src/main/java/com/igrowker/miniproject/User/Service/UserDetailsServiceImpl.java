@@ -1,14 +1,12 @@
 package com.igrowker.miniproject.User.Service;
 
 import com.igrowker.miniproject.Config.Jwt.JwtUtils;
-import com.igrowker.miniproject.Exception.User.PasswordMismatchException;
+import com.igrowker.miniproject.User.Exception.PasswordMismatchException;
 import com.igrowker.miniproject.User.Dto.AuthCreateUserRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthLoginRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseRegisterDto;
-import com.igrowker.miniproject.User.Model.Role;
 import com.igrowker.miniproject.User.Model.UserEntity;
-import com.igrowker.miniproject.User.Repository.RoleRepository;
 import com.igrowker.miniproject.User.Repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +22,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;

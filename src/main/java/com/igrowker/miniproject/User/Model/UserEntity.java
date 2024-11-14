@@ -1,12 +1,7 @@
 package com.igrowker.miniproject.User.Model;
 
-import com.igrowker.miniproject.Exception.User.PasswordMismatchException;
-import com.igrowker.miniproject.User.Model.Enum.EnumCountry;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor

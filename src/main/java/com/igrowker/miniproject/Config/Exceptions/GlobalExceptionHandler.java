@@ -1,6 +1,9 @@
 package com.igrowker.miniproject.Config.Exceptions;
 
-import com.igrowker.miniproject.Exception.User.PasswordMismatchException;
+import com.igrowker.miniproject.User.Exception.PasswordMismatchException;
+import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
+import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
+import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -105,6 +108,18 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", "Password Mismatch");
         errorResponse.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidUserIdException.class)
+    public ResponseEntity<UserProfileResponseDTO> handleInvalidUserId(InvalidUserIdException ex) {
+        UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<UserProfileResponseDTO> handleUserNotFound(UserNotFoundException ex) {
+        UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.igrowker.miniproject.Exception.User;
+package com.igrowker.miniproject.User.Exception;
 
 public class PasswordMismatchException extends RuntimeException {
     public PasswordMismatchException(String message) {
