@@ -112,13 +112,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidUserIdException.class)
     public ResponseEntity<UserProfileResponseDTO> handleInvalidUserId(InvalidUserIdException ex) {
-        UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, ex.getMessage());
+        UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null,null, null, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<UserProfileResponseDTO> handleUserNotFound(UserNotFoundException ex) {
-        UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, ex.getMessage());
+        UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, null, null, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
