@@ -31,7 +31,11 @@ public class UserEntity {
 
     private String role;
 
-    private String profilePhotoPath;
+    private String fileName;
+    private String fileType;
+
+    @Lob // Large object to store binary data
+    private byte[] data;
 
     @Enumerated(value = EnumType.STRING)
     private EnumCountry country;

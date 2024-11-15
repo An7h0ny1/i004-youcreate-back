@@ -46,6 +46,7 @@ public class UserController {
         }
     }
 
+    /*
     @Operation(summary = "Upload a profile photo")
     @PostMapping(value = "/update-photo", consumes = "multipart/form-data")
     public ResponseEntity<String> updateProfilePhoto(
@@ -57,6 +58,16 @@ public class UserController {
 
             // Devuelve la ruta donde se guardó la foto (esto podría cambiarse para devolver una URL)
             return ResponseEntity.ok("Profile photo updated. Saved at: " + filePath);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Failed to upload photo: " + e.getMessage());
+        }
+    }*/
+
+    @PostMapping(value = "/update-photo", consumes = "multipart/form-data")
+    public ResponseEntity<String> updateProfilePhoto(@RequestParam("photo") MultipartFile photo) {
+        try {
+            UserEntity savedPhoto = profilePhotoService.saveProfilePhoto(photo);
+            return ResponseEntity.ok("Profile photo uploaded successfully with ID: " + savedPhoto.getId());
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Failed to upload photo: " + e.getMessage());
         }
