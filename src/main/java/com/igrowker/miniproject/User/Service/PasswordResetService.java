@@ -1,16 +1,12 @@
 package com.igrowker.miniproject.User.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.igrowker.miniproject.Config.Jwt.JwtUtils;
 import com.igrowker.miniproject.User.Model.PasswordReset;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.PasswordResetRepository;

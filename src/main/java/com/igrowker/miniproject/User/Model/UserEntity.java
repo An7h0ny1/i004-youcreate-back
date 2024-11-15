@@ -5,9 +5,6 @@ import com.igrowker.miniproject.User.Model.Enum.EnumCountry;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

@@ -31,9 +31,22 @@ public class EmailService {
         } catch (Exception e) {
             throw e;
         }
-        
     }
 
+    public String sendEmailForVerification2FA(String email){
+        try {
+            Integer token = new Random().nextInt(9000) + 1000;
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Email Verification Code for password reset");
+            message.setText("Your register verification code is: "+ host + token.toString());
+            mailSender.send(message);
+            return token.toString();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
 
     
 }
