@@ -5,17 +5,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import javax.naming.NameNotFoundException;
-
 import org.apache.coyote.BadRequestException;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.igrowker.miniproject.User.Dto.TwoFARegisterVerificationDTO;
 import com.igrowker.miniproject.User.Model.RegisterVerification2FA;
 import com.igrowker.miniproject.User.Repository.RegisterVerification2FARepository;
-import com.igrowker.miniproject.User.Repository.UserRepository;
 
 @Service
 public class RegisterVerification2FAService {
