@@ -1,11 +1,7 @@
 package com.igrowker.miniproject.User.Model;
 
-import com.igrowker.miniproject.User.Model.Enum.EnumCountry;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,20 +15,27 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(name = "user_name")
     private String userName;
 
+    @Column(name = "last_name")
+    private String lastName;
 
     private String password;
+
+    @Column(name = "confirm_password")
+    @Transient
+    private String confirmPassword;
 
     @Column(unique = true)
     private String email;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     private String role;
 
-    @Enumerated(value = EnumType.STRING)
-    private EnumCountry country;
+    private String country;
 
     @Column(name = "is_enabled")
     private boolean isEnabled;

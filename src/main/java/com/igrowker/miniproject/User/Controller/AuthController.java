@@ -106,16 +106,8 @@ public class AuthController {
             )
     )
     public ResponseEntity<?> register(@RequestBody @Valid AuthCreateUserRequestDto authCreateUserDto) {
-        log.debug("Received request to register user: {}", authCreateUserDto.userName());
-        try {
-            log.debug("Creating user: {}", authCreateUserDto.userName());
             AuthResponseRegisterDto response = this.userDetailsServiceImpl.createUser(authCreateUserDto);
-            log.debug("User created successfully: {}", authCreateUserDto.userName());
             return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (Exception e) {
-            log.error("Error during registration: {}", authCreateUserDto.userName(), e);
-            return new ResponseEntity<>("An error occurred during registration", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @PostMapping("/logout")
