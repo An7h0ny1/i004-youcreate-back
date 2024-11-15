@@ -2,6 +2,7 @@ package com.igrowker.miniproject.Config.Filters;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.igrowker.miniproject.Config.Jwt.JwtUtils;
+import com.igrowker.miniproject.Config.TokenBlacklist;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,9 +26,11 @@ import java.util.Collection;
 public class JwtTokenValidator extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
+    private final TokenBlacklist tokenBlacklist;
 
-    public JwtTokenValidator(JwtUtils jwtUtils) {
+    public JwtTokenValidator(JwtUtils jwtUtils, TokenBlacklist tokenBlacklist) {
         this.jwtUtils = jwtUtils;
+        this.tokenBlacklist = tokenBlacklist;
     }
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -39,6 +42,10 @@ public class JwtTokenValidator extends OncePerRequestFilter {
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
             jwtToken = jwtToken.substring(7);
 
+            if (tokenBlacklist.isTokenBlacklisted(jwtToken)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
 
             try {
                 DecodedJWT decodedJWT = jwtUtils.validateToken(jwtToken);

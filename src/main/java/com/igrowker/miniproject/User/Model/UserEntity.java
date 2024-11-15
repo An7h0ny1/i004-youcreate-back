@@ -1,5 +1,7 @@
 package com.igrowker.miniproject.User.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,6 +30,7 @@ public class UserEntity {
     private String confirmPassword;
 
     @Column(unique = true)
+    @JsonProperty("email")
     private String email;
 
     @Column(name = "phone_number")
