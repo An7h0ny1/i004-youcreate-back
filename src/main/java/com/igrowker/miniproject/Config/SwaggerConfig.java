@@ -13,18 +13,18 @@ import org.springframework.http.HttpHeaders;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "Veterinary Hospital Manager API",
-                description = "API para la gestión de la clinica veterinaria",
-                termsOfService = "www.clinicaveterinaria.com/terms/",
+                title = "YOU CREATE API",
+                description = "API para la gestión financiera integral de creadores de contenido.",
+                termsOfService = "www.youcreate.com/terms/",
                 version = "1.0.0",
                 contact = @Contact(
-                        name = "Gestor Clinica",
-                        url = "www.clinicaveterinaria.com/contact/",
-                        email = "clinicaveterinaria@gmail.com"
+                        name = "Equipo de Soporte de YouCreate",
+                        url = "www.youcreate.com/contact/",
+                        email = "soporte@youcreate.com"
                 ),
                 license = @License(
-                        name = "Standard Apache License Version 2.0 for Clínica Veterinaria",
-                        url = "www.clinicaveterinaria.com/license/",
+                        name = "Standard Apache License Version 2.0 for YouCreate",
+                        url = "www.youcreate.com/license/",
                         identifier = "Apache-2.0"
                 )
         ),
@@ -35,7 +35,7 @@ import org.springframework.http.HttpHeaders;
                 ),
                 @Server(
                         description = "Render Server",
-                        url = "https://veterinaria-bef3.onrender.com"
+                        url = "https://youcreate.com"
                 )
         }
         /*security = @SecurityRequirement(
