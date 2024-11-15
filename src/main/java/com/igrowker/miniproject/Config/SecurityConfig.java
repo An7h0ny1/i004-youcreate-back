@@ -35,6 +35,7 @@ public class SecurityConfig  {
 
 
     private final JwtUtils jwtUtils;
+    private final TokenBlacklist tokenBlacklist;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -53,7 +54,7 @@ public class SecurityConfig  {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JwtTokenValidator(jwtUtils, tokenBlacklist), BasicAuthenticationFilter.class)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)); // Permitir iframes para la consola H2
 
         return http.build();

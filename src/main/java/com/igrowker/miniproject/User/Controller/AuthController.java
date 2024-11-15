@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.User.Controller;
 
+import com.igrowker.miniproject.Config.TokenBlacklist;
 import com.igrowker.miniproject.User.Dto.AuthCreateUserRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthLoginRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseDto;
@@ -11,9 +12,11 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class AuthController {
 
+    private final TokenBlacklist tokenBlacklist;
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
 
@@ -112,5 +116,46 @@ public class AuthController {
             log.error("Error during registration: {}", authCreateUserDto.userName(), e);
             return new ResponseEntity<>("An error occurred during registration", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/logout")
+    @Tag(name = "Authentication", description = "API for user authentication.")
+    @Operation(
+            summary = "Logout",
+            description = "Invalidate the user's JWT token to log them out.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Logout successful",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class),
+                                    examples = @ExampleObject(
+                                            name = "Success Response",
+                                            value = "\"Logout successful\""
+                                    )
+                            )
+                    ),
+                    @ApiResponse(responseCode = "400", description = "Invalid token",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "Bad Request Response",
+                                            value = "\"Invalid token\""
+                                    )
+                            )
+                    )
+            }
+    )
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        // Obtener el token del encabezado Authorization
+        // Se extrae el valor del encabezado "Authorization" de la solicitud HTTP
+        String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
+            jwtToken = jwtToken.substring(7);
+            // Invalidar el token agregándolo a la blacklist (lista negra)
+            // Esto significa que el token ya no será válido para futuras solicitudes
+            tokenBlacklist.blacklistToken(jwtToken);
+            return ResponseEntity.ok("Logout successful");
+        }
+        return ResponseEntity.badRequest().body("Invalid token");
     }
 }
