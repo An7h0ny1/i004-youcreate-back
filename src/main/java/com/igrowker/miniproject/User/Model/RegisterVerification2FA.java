@@ -2,6 +2,8 @@ package com.igrowker.miniproject.User.Model;
 
 import java.time.LocalDateTime;
 
+import org.springframework.lang.Nullable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +34,8 @@ public class RegisterVerification2FA{
 
     private LocalDateTime expired_at;
 
+    @Nullable
+    private String status;
     
 
 }
