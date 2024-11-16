@@ -1,5 +1,8 @@
 package com.igrowker.miniproject.User.Service;
 
+import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
+import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
+import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -36,29 +37,73 @@ public class UserServiceTest {
         UserEntity userEntity = UserEntity.builder()
                 .id(1L)
                 .userName("testUser")
+                .lastName("testLastName")
                 .email("test@gmail.com")
+                .phoneNumber("123456789")
+                .country("testCountry")
                 .build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
 
         // When
-        UserEntity result = userService.getUserProfile(1L);
+        UserProfileResponseDTO result = userService.getUserProfile(1L);
 
         // Then
         assertNotNull(result, "El usuario debería existir");
-        assertEquals(1L, result.getId());
-        assertEquals("testUser", result.getUserName());
-        assertEquals("test@gmail.com", result.getEmail());
+        assertEquals(1L, result.id());
+        assertEquals("testUser", result.userName());
+        assertEquals("testLastName", result.lastName());
+        assertEquals("test@gmail.com", result.email());
+        assertEquals("123456789", result.phone());
+        assertEquals("testCountry", result.country());
     }
 
     @Test
     @DisplayName("Test para obtener el perfil de un usuario que no existe")
     public void testGetUserProfile_UserNotFound() {
+        // Given
+        Long nonExistentUserId = 1L;
+        when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
+
         // When
-        when(userRepository.findById(2L)).thenReturn(Optional.empty());
-        UserEntity result = userService.getUserProfile(2L);
+        UserNotFoundException result = assertThrows(UserNotFoundException.class, () -> userService.getUserProfile(nonExistentUserId));
 
         // Then
-        assertNull(result, "El resultado debería ser null si el usuario no existe");
+        assertEquals("Usuario con id " + nonExistentUserId + " no encontrado", result.getMessage());
+    }
+
+    @Test
+    @DisplayName("Test para actualizar el perfil de un usuario")
+    public void testUpdateUserProfile_UserExists() {
+        // Given
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L)
+                .userName("testUser")
+                .lastName("testLastName")
+                .email("test@gmail.com")
+                .phoneNumber("123456789")
+                .country("testCountry")
+                .build();
+
+        UserUpdateRequestDTO userUpdateRequestDTO = UserUpdateRequestDTO.builder()
+                .userName("newTestUser")
+                .lastName("newTestLastName")
+                .email("test@gmail.com")
+                .phoneNumber("123456789")
+                .country("testCountry")
+                .build();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
+
+        // When
+
+        UserProfileResponseDTO result = userService.updateUserProfile(1L, userUpdateRequestDTO);
+
+        // Then
+        assertNotNull(result, "El usuario debería existir");
+        assertEquals(1L, result.id());
+        assertEquals("newTestUser", result.userName());
+        assertEquals("newTestLastName", result.lastName());
+        assertEquals("test@gmail.com", result.email());
     }
 }
