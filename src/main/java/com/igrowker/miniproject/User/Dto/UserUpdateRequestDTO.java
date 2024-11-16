@@ -14,7 +14,12 @@ import lombok.NoArgsConstructor;
 public class UserUpdateRequestDTO {
     @NotBlank(message = "Username is required")
     public String userName;
+    @NotBlank(message = "Last name is required")
     public String lastName;
     @Email(message = "Email should be valid")
     public String email;
+    @NotBlank(message = "Phone number is required")
+    public String phoneNumber;
+    @NotBlank(message = "Country is required")
+    public String country;
 }
