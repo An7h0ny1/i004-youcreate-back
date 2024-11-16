@@ -2,6 +2,7 @@ package com.igrowker.miniproject.User.Service;
 
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
+import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.UserRepository;
@@ -33,50 +34,36 @@ public class UserService {
     }
 
     public UserProfileResponseDTO getUserProfile(Long id) {
-        UserEntity user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return new UserProfileResponseDTO(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    "Usuario no encontrado"
-            );
+        if (id <= 0) {
+            throw new InvalidUserIdException("El id del usuario debe ser mayor a 0");
         }
-        return new UserProfileResponseDTO(
-                user.getId(),
-                user.getUserName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getCountry(),
-                "Usuario encontrado satisfactoriamente"
-        );
+
+        return userRepository.findById(id)
+                .map(user -> new UserProfileResponseDTO(
+                        user.getId(),
+                        user.getUserName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getPhoneNumber(),
+                        user.getCountry()
+                ))
+                .orElseThrow(() -> new UserNotFoundException("Usuario con id " + id + " no encontrado"));
     }
 
     public UserProfileResponseDTO updateUserProfile(Long id, UserUpdateRequestDTO userEntity) {
+        if (id <= 0) {
+            throw new InvalidUserIdException("El id del usuario debe ser mayor a 0");
+        }
         UserEntity user = userRepository.findById(id).orElse(null);
         if (user == null) {
-            throw new UserNotFoundException("Usuario no encontrado");
+            throw new UserNotFoundException("Usuario con id " + id + " no encontrado");
         }
 
-        if (!user.getUserName().equals(userEntity.getUserName())) {
-            user.setUserName(userEntity.getUserName());
-        }
-        if (!user.getLastName().equals(userEntity.getLastName())) {
-            user.setLastName(userEntity.getLastName());
-        }
-        if (!user.getEmail().equals(userEntity.getEmail())) {
-            user.setEmail(userEntity.getEmail());
-        }
-        if (!user.getPhoneNumber().equals(userEntity.getPhoneNumber())) {
-            user.setPhoneNumber(userEntity.getPhoneNumber());
-        }
-        if (!user.getCountry().equals(userEntity.getCountry())) {
-            user.setCountry(userEntity.getCountry());
-        }
+        user.setUserName(userEntity.getUserName());
+        user.setLastName(userEntity.getLastName());
+        user.setEmail(userEntity.getEmail());
+        user.setPhoneNumber(userEntity.getPhoneNumber());
+        user.setCountry(userEntity.getCountry());
 
         userRepository.save(user);
 
@@ -86,8 +73,7 @@ public class UserService {
                 user.getLastName(),
                 user.getEmail(),
                 user.getPhoneNumber(),
-                user.getCountry(),
-                "Usuario actualizado satisfactoriamente"
+                user.getCountry()
         );
     }
 

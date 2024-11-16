@@ -2,6 +2,7 @@ package com.igrowker.miniproject.User.Service;
 
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
+import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -62,11 +61,15 @@ public class UserServiceTest {
     @Test
     @DisplayName("Test para obtener el perfil de un usuario que no existe")
     public void testGetUserProfile_UserNotFound() {
+        // Given
+        Long nonExistentUserId = 1L;
+        when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
+
         // When
-        UserProfileResponseDTO result = userService.getUserProfile(2L);
+        UserNotFoundException result = assertThrows(UserNotFoundException.class, () -> userService.getUserProfile(nonExistentUserId));
 
         // Then
-        assertEquals("Usuario no encontrado", result.message());
+        assertEquals("Usuario con id " + nonExistentUserId + " no encontrado", result.getMessage());
     }
 
     @Test

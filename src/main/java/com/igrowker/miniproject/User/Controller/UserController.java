@@ -4,9 +4,8 @@ import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 import com.igrowker.miniproject.User.Exception.UserNotFoundException;
-import com.igrowker.miniproject.User.Model.User;
-import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Service.UserService;
+import com.igrowker.miniproject.Utils.Api_Response;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -14,20 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
 import java.io.IOException;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -46,7 +39,7 @@ public class UserController {
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService);
     }
-    
+
 
     @GetMapping("/{id}")
     @Tag(name = "UserProfile", description = "API for get user profile data.")
@@ -57,16 +50,19 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<UserProfileResponseDTO> getUserProfile(@PathVariable Long id) {
+    public ResponseEntity<Api_Response<UserProfileResponseDTO>> getUserProfile(@PathVariable @Valid Long id) {
         try {
             UserProfileResponseDTO response = userService.getUserProfile(id);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(new Api_Response<>(response, "Usuario encontrado satisfactoriamente", 200));
         } catch (UserNotFoundException e) {
-            return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Api_Response<>(null, e.getMessage(), 404));
         } catch (InvalidUserIdException e) {
-            return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Api_Response<>(null, e.getMessage(), 400));
         } catch (Exception e) {
-            return buildErrorResponse("Hubo un error en el servidor", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Api_Response<>(null, "Hubo un error en el servidor", 500));
         }
     }
 
@@ -86,7 +82,7 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @Tag(name = "UpdateDataUser", description = "API for update user profile data.")
     @Operation(summary = "Update User Fields", description = "Update specific fields of user profile by id.")
     @ApiResponses({
@@ -95,21 +91,24 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<UserProfileResponseDTO> updateFields(@PathVariable Long id, @Valid @RequestBody UserUpdateRequestDTO request) {
+    public ResponseEntity<Api_Response<UserProfileResponseDTO>> updateFields(@PathVariable @Valid Long id, @Valid @RequestBody UserUpdateRequestDTO request) {
         try {
             UserProfileResponseDTO response = userService.updateUserProfile(id, request);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(new Api_Response<>(response, "Usuario actualizado satisfactoriamente", 200));
         } catch (UserNotFoundException e) {
-            return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Api_Response<>(null, e.getMessage(), 404));
         } catch (InvalidUserIdException e) {
-            return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Api_Response<>(null, e.getMessage(), 400));
         } catch (Exception e) {
-            return buildErrorResponse("Hubo un error en el servidor", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Api_Response<>(null, "Hubo un error en el servidor", 500));
         }
     }
 
     public ResponseEntity<UserProfileResponseDTO> buildErrorResponse(String message, HttpStatus status) {
         return ResponseEntity.status(status)
-                .body(new UserProfileResponseDTO(null, null, null, null, null, null, message));
+                .body(new UserProfileResponseDTO(null, null, null, null, null, null));
     }
 }
