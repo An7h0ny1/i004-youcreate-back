@@ -1,29 +1,29 @@
 package com.igrowker.miniproject.User.Service;
 
+import com.igrowker.miniproject.User.Dto.TwoFARegisterVerificationDTO;
 import com.igrowker.miniproject.User.Model.RegisterVerification2FA;
-import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.RegisterVerification2FARepository;
-import com.igrowker.miniproject.User.Repository.UserRepository;
+
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
+
+//pruebas hechas para h2, no correr en produccion
 @SpringBootTest
 public class RegisterVerification2FATest{
 
@@ -35,7 +35,7 @@ public class RegisterVerification2FATest{
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        repository.deleteAll();
     }
 
     @Test
@@ -86,4 +86,32 @@ public class RegisterVerification2FATest{
         assertNotNull(result.get().getExpired_at());
         assertTrue(LocalDateTime.now().isBefore(result.get().getExpired_at()));
     }
+
+    @Test
+    @DisplayName("Deberia lanzar un no such element exception al no esta el email en la base de datos")
+    public void verificate2FAtokenMailNotFoundTest(){
+        TwoFARegisterVerificationDTO fa = new TwoFARegisterVerificationDTO("christian@gmail.com", "1234");
+        
+        assertThrows(NoSuchElementException.class, () -> service.verificate2FAtoken(fa));
+
+    }
+
+    @Test
+    @DisplayName("Deberia lanzar un bad request exception si el email es null")
+    public void verificate2FAtokenMailIsNullTest(){
+        TwoFARegisterVerificationDTO fa = new TwoFARegisterVerificationDTO(null, "1234");
+        
+        assertThrows(BadRequestException.class, () -> service.verificate2FAtoken(fa));
+
+    }
+
+    @Test
+    @DisplayName("Deberia lanzar un bad request exception si el token es null")
+    public void verificate2FAtokenTokenIsNullTest(){
+        TwoFARegisterVerificationDTO fa = new TwoFARegisterVerificationDTO("christian@mail.com", null);
+        
+        assertThrows(BadRequestException.class, () -> service.verificate2FAtoken(fa));
+
+    }
+
 }
