@@ -25,7 +25,7 @@ public class EmailService {
 
             message.setTo(email);
             message.setSubject("Email Verification Code for password reset");
-            message.setText("Your verification code is: "+ host + token.toString());
+            message.setText("Your verification code is: "+ System.getenv("HOST") + token.toString());
             mailSender.send(message);
             return token;
         } catch (Exception e) {

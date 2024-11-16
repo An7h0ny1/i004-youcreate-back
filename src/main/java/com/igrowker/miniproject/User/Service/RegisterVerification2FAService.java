@@ -32,7 +32,6 @@ public class RegisterVerification2FAService {
             String token = mailSender.sendEmailForVerification2FA(email);
             LocalDateTime datetime = LocalDateTime.now();
             RegisterVerification2FA fa = new RegisterVerification2FA();
-
             fa.setEmail(email);
             fa.setToken(token);
             fa.setCreated_at(datetime);
