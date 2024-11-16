@@ -38,7 +38,11 @@ public class UserEntity {
 
     private String role;
 
+    private String profilePhotoPath;
+
+
     private String country;
+
 
     @Column(name = "is_enabled")
     private boolean isEnabled;
