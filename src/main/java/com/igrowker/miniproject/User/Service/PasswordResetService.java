@@ -55,13 +55,21 @@ public class PasswordResetService {
     public boolean validate(String token, String email, String password) throws Exception {
 
         Optional<PasswordReset> passwordreset = resetrepository.findByEmail(email);
-        System.out.println("el email es " + email);
         if (passwordreset.isPresent()) {
+
+            PasswordReset pass = passwordreset.get();
+            if (pass.getStatus().equals("USED")) 
+                throw new IllegalStateException("Tu token ya fue utilizado");
+
             if (!isValidToken(token, passwordreset.get()))
                 return false;
 
             UserEntity user = userRepository.findByEmail(email).get();
+
             user.setPassword(password);
+            pass.setStatus("USED");
+
+            resetrepository.save(pass);
             userRepository.save(user);
             
             return true;

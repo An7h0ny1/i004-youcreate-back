@@ -8,7 +8,8 @@ import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -28,8 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RegisterVerification2FATest{
 
   
+    @Mock
     @Autowired
     private RegisterVerification2FARepository repository;
+
+    @InjectMocks
     @Autowired
     private RegisterVerification2FAService service;
 
@@ -44,7 +48,7 @@ public class RegisterVerification2FATest{
 
         RegisterVerification2FA register = new RegisterVerification2FA();
 
-        register.setEmail("gabriellimiguel123@mail.com");
+        register.setEmail("robotit@mail.com");
 
       
         assertDoesNotThrow(() -> {
@@ -74,7 +78,7 @@ public class RegisterVerification2FATest{
 
     @Test
     @DisplayName("El token de expiracion esta antes del tiempo actual")
-    public void TokenExpiredTest() throws Exception{
+    public void TokenExpiredHappyTest() throws Exception{
         
         RegisterVerification2FA register = new RegisterVerification2FA();
 
@@ -111,6 +115,57 @@ public class RegisterVerification2FATest{
         TwoFARegisterVerificationDTO fa = new TwoFARegisterVerificationDTO("christian@mail.com", null);
         
         assertThrows(BadRequestException.class, () -> service.verificate2FAtoken(fa));
+
+    }
+
+
+    @Test
+    @DisplayName("Se analiza un token ya utilizada")
+    public void verificate2FAtokenAndTokenIsUsed() throws Exception{
+        TwoFARegisterVerificationDTO fa = new TwoFARegisterVerificationDTO("christian@mail.com", "1234");
+        RegisterVerification2FA register = new RegisterVerification2FA();
+        register.setEmail("christian@mail.com");
+        register.setToken("1234");
+        register.setCreated_at(LocalDateTime.now());
+        register.setExpired_at(LocalDateTime.now().plusMinutes(3));
+
+        assertDoesNotThrow(() -> repository.save(register));
+
+        assertEquals(service.verificate2FAtoken(fa), "OK");
+        assertEquals(repository.findByEmail(fa.email()).get().getStatus(), "USED");
+
+
+    }
+
+    @Test
+    @DisplayName("Se analiza un token que es distinto al pasado por body")
+    public void verificate2FAtokenTokenButTokenIsNotEquals() throws Exception {
+        TwoFARegisterVerificationDTO fa = new TwoFARegisterVerificationDTO("christian@mail.com", "3555");
+        RegisterVerification2FA register = new RegisterVerification2FA();
+        register.setEmail("christian@mail.com");
+        register.setToken("1234");
+        register.setCreated_at(LocalDateTime.now());
+        register.setExpired_at(LocalDateTime.now().plusMinutes(3));
+
+        assertDoesNotThrow(() -> repository.save(register));
+        assertEquals(service.verificate2FAtoken(fa), "INVALID");
+
+
+    }
+
+    @Test
+    @DisplayName("Se analiza un token que ya esta expirado")
+    public void verificate2FAtokenTokenButTokenIsExpired() throws Exception {
+        TwoFARegisterVerificationDTO fa = new TwoFARegisterVerificationDTO("christian@mail.com", "1234");
+        RegisterVerification2FA register = new RegisterVerification2FA();
+        register.setEmail("christian@mail.com");
+        register.setToken("1234");
+        register.setCreated_at(LocalDateTime.now());
+        register.setExpired_at(LocalDateTime.now().minusMinutes(3));
+
+        assertDoesNotThrow(() -> repository.save(register));
+        assertEquals(service.verificate2FAtoken(fa), "EXPIRED");
+
 
     }
 

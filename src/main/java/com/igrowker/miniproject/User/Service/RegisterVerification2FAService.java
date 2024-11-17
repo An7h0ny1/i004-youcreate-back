@@ -59,14 +59,18 @@ public class RegisterVerification2FAService {
         if (register.isPresent()) {
             
             String token  = register.get().getToken();
-            if (register.get().getStatus() != null) {
+            
+            if (register.get().getStatus() != null) 
                 return "USED";
-            }
+            
+
             if (!token.equals(fa.token())) return "INVALID";
             if (tokenIsExpired(register.get())) return "EXPIRED";
+
             RegisterVerification2FA register_bdd = register.get();
             register_bdd.setStatus("USED");
             registerVerification2FARepository.save(register_bdd);
+
             return "OK";
         }
         throw new NoSuchElementException("No se encontro al registro de ese usuario");

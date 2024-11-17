@@ -49,17 +49,24 @@ public class PasswordResetController {
     }
 
     @PatchMapping("/{token}")
-    public ResponseEntity<String> resetPassword(@org.springframework.web.bind.annotation.RequestBody UserReset user, @PathVariable String token) throws Exception {
-
-        boolean status = senderResetService.validate(token, user.getEmail(), user.getPassword());
-        return (status) ? ResponseEntity.ok("Se ha actualizado correctamente") : ResponseEntity.badRequest().build();
+    public ResponseEntity<?> resetPassword(@org.springframework.web.bind.annotation.RequestBody UserReset user, @PathVariable String token)  {
+        try {
+            boolean status = senderResetService.validate(token, user.getEmail(), user.getPassword());
+            if (!status) return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok("Se ha actualizado correctamente");
+        } catch(IllegalStateException exception){
+            return ResponseEntity.ok(exception.getMessage());
+        }  catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+       
 
     }
 
 }
 
 @Data
-class UserReset{
+class UserReset {
     String email;
     String password;
 }
