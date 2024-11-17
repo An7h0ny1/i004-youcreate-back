@@ -7,8 +7,6 @@ import com.igrowker.miniproject.User.Dto.TwoFARegisterVerificationDTO;
 import com.igrowker.miniproject.User.Model.RegisterVerification2FA;
 import com.igrowker.miniproject.User.Service.RegisterVerification2FAService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-
 import java.util.List;
 import java.util.Optional;
 

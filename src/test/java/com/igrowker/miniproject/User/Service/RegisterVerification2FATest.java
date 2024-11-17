@@ -29,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RegisterVerification2FATest{
 
   
-    @Mock
+    
     @Autowired
     private RegisterVerification2FARepository repository;
 
-    @InjectMocks
+   
     @Autowired
     private RegisterVerification2FAService service;
 

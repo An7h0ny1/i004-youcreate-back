@@ -41,6 +41,6 @@ public class PasswordReset {
 
     private LocalDateTime expired_at;
 
-    @Nullable
+    @org.springframework.lang.Nullable
     private String status;
 }

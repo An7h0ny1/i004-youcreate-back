@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.igrowker.miniproject.User.Exception.PasswordMismatchException;
+import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import com.igrowker.miniproject.User.Model.PasswordReset;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.PasswordResetRepository;
@@ -39,7 +41,7 @@ public class PasswordResetService {
             resetrepository.save(reset);
 
         } else {
-            throw new RuntimeException("No se ha encontrado a un usuario con ese mail");
+            throw new UserNotFoundException("No se ha encontrado a un usuario con ese mail");
         }
 
     }
@@ -47,6 +49,9 @@ public class PasswordResetService {
     private boolean isValidToken(String token, PasswordReset passwordreset) {
 
         if (passwordreset.getExpired_at().isBefore(LocalDateTime.now())) { // si fecha de expiracion < momento actual
+            return false;
+        }
+        if (!token.equals(passwordreset.getToken().toString())) {
             return false;
         }
         return true;
@@ -58,7 +63,7 @@ public class PasswordResetService {
         if (passwordreset.isPresent()) {
 
             PasswordReset pass = passwordreset.get();
-            if (pass.getStatus().equals("USED")) 
+            if (pass.getStatus() != null) 
                 throw new IllegalStateException("Tu token ya fue utilizado");
 
             if (!isValidToken(token, passwordreset.get()))
@@ -74,7 +79,7 @@ public class PasswordResetService {
             
             return true;
         }
-        return false;
+        throw new PasswordMismatchException("Ese usuario no tiene una solicitud de reset");
 
     }
 
