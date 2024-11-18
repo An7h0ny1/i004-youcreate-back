@@ -26,6 +26,8 @@ public class PasswordResetService {
     @Autowired
     private EmailService mailSender;
 
+    
+
     public void sendEmailReset(String email) throws Exception {
         Optional<UserEntity> user = userRepository.findByEmail(email);
 
@@ -71,6 +73,7 @@ public class PasswordResetService {
 
             UserEntity user = userRepository.findByEmail(email).get();
 
+            
             user.setPassword(password);
             pass.setStatus("USED");
 

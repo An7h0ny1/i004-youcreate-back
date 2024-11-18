@@ -4,6 +4,7 @@ import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 import com.igrowker.miniproject.User.Exception.UserNotFoundException;
+import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Service.UserService;
 import com.igrowker.miniproject.Utils.Api_Response;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,6 +22,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import java.io.IOException;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -37,8 +41,15 @@ public class UserController {
 
     @GetMapping("")
     public ResponseEntity<?> getAllUsers() {
-        return ResponseEntity.ok(userService);
+        return ResponseEntity.ok(userService.getAllUsers());
     }
+
+    @PostMapping("")
+    public void SaveUser(@RequestBody UserEntity entity) {
+        
+        userService.saveUser(entity);
+    }
+    
 
 
     @GetMapping("/{id}")

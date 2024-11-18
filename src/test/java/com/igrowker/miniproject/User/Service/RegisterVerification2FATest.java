@@ -35,7 +35,7 @@ public class RegisterVerification2FATest{
 
    
     @Autowired
-    private RegisterVerification2FAService service;
+    private IRegisterVerification2FAService service;
 
     @BeforeEach
     public void setUp() {
