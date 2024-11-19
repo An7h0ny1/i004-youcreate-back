@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,9 @@ public class EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
-    private final String host = "http//localhost:8080/reset/";
+    
+    @Value("${app.host}")
+    private String host;
 
     public UUID sendResetPassword(UserEntity user, String email){
 

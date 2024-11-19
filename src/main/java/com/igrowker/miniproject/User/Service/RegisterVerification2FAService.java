@@ -11,13 +11,18 @@ import org.springframework.stereotype.Service;
 
 import com.igrowker.miniproject.User.Dto.TwoFARegisterVerificationDTO;
 import com.igrowker.miniproject.User.Model.RegisterVerification2FA;
+import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.RegisterVerification2FARepository;
+import com.igrowker.miniproject.User.Repository.UserRepository;
 
 @Service
-public class RegisterVerification2FAService {
+public class RegisterVerification2FAService implements IRegisterVerification2FAService{
 
     @Autowired
     private RegisterVerification2FARepository registerVerification2FARepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private EmailService mailSender;
@@ -32,7 +37,6 @@ public class RegisterVerification2FAService {
             String token = mailSender.sendEmailForVerification2FA(email);
             LocalDateTime datetime = LocalDateTime.now();
             RegisterVerification2FA fa = new RegisterVerification2FA();
-
             fa.setEmail(email);
             fa.setToken(token);
             fa.setCreated_at(datetime);
@@ -44,10 +48,6 @@ public class RegisterVerification2FAService {
 
     }
 
-    public Optional<RegisterVerification2FA> validateEmail(String email) {
-        return registerVerification2FARepository.findByEmail(email);
-    }
-
     public String verificate2FAtoken(TwoFARegisterVerificationDTO fa) throws Exception {
 
         if (fa.email() == null) 
@@ -57,17 +57,28 @@ public class RegisterVerification2FAService {
             throw new BadRequestException("No se paso el token por parametro");
         }
         Optional<RegisterVerification2FA> register = registerVerification2FARepository.findByEmail(fa.email());
-        if (register.isPresent()) {
+        Optional<UserEntity> userOPT = userRepository.findByEmail(fa.email());
+        if (register.isPresent() && userOPT.isPresent()) {
             
             String token  = register.get().getToken();
-            if (register.get().getStatus() != null) {
+            
+            if (register.get().getStatus() != null) 
                 return "USED";
-            }
+            
+
             if (!token.equals(fa.token())) return "INVALID";
             if (tokenIsExpired(register.get())) return "EXPIRED";
+
+
+            UserEntity user = userOPT.get();
             RegisterVerification2FA register_bdd = register.get();
+
             register_bdd.setStatus("USED");
             registerVerification2FARepository.save(register_bdd);
+            
+            user.setEnabled(true);
+            userRepository.save(user);
+
             return "OK";
         }
         throw new NoSuchElementException("No se encontro al registro de ese usuario");
@@ -75,5 +86,9 @@ public class RegisterVerification2FAService {
 
     private boolean tokenIsExpired(RegisterVerification2FA registerVerification2FA){
         return registerVerification2FA.getExpired_at().isBefore(LocalDateTime.now());
+    }
+
+    public Optional<RegisterVerification2FA> validateEmail(String email) {
+        return registerVerification2FARepository.findByEmail(email);
     }
 }
