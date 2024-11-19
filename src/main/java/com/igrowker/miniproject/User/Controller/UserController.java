@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/v1/user")
+@Tag(name = "User", description = "User API")
 public class UserController {
 
     private final UserService userService;
@@ -39,12 +40,28 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("")
+    @GetMapping("/getAll")
+    @Tag(name = "User")
+    @Operation(
+            summary = "Get All Users",
+            description = "Get All Users",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Get All Users")
+            }
+    )
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PostMapping("")
+    @PostMapping("/save")
+    @Tag(name = "User")
+    @Operation(
+            summary = "Save User",
+            description = "Save User",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Save User")
+            }
+    )
     public void SaveUser(@RequestBody UserEntity entity) {
         
         userService.saveUser(entity);
@@ -53,7 +70,7 @@ public class UserController {
 
 
     @GetMapping("/{id}")
-    @Tag(name = "UserProfile", description = "API for get user profile data.")
+    @Tag(name = "User", description = "API for get user profile data.")
     @Operation(summary = "Get User Profile", description = "Get user profile data by id.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Usuario encontrado satisfactoriamente"),
@@ -77,7 +94,13 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "Upload a profile photo")
+    @Operation(summary = "Upload a profile photo", description = "Upload a profile photo",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Profile photo uploaded successfully"),
+                    @ApiResponse(responseCode = "500", description = "Failed to upload photo")
+            }
+    )
+    @Tag(name = "User")
     @PostMapping(value = "/update-photo", consumes = "multipart/form-data")
     public ResponseEntity<String> updateProfilePhoto(
             @Parameter(description = "Profile photo file", required = true)
@@ -94,7 +117,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @Tag(name = "UpdateDataUser", description = "API for update user profile data.")
+    @Tag(name = "User", description = "API for update user profile data.")
     @Operation(summary = "Update User Fields", description = "Update specific fields of user profile by id.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Usuario actualizado satisfactoriamente"),
