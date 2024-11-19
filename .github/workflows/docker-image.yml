@@ -34,16 +34,17 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}  # Variable del entorno
-          password: ${{ env.DOCKERHUB_TOKEN }}     # Variable del entorno
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ env.IMAGE_NAME }}:latest .
+          docker build -t ${{ env.IMAGE_NAME }}:latest 
           docker push ${{ env.IMAGE_NAME }}:latest
 
       - name: Logout from Docker Hub
         run: docker logout
+
       #- name: Deploy to Render
       #  env:
        #   deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
