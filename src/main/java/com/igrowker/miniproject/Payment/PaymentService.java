@@ -3,12 +3,13 @@ package com.igrowker.miniproject.Payment;
 import java.util.List;
 import java.util.Optional;
 
-import javax.naming.NameNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 
+@Service
 public class PaymentService implements IPaymentService {
 
     @Autowired
@@ -31,38 +32,38 @@ public class PaymentService implements IPaymentService {
     }
 
 
+
+
     @Override
-    public List<Payment> getPaymentsByCategory(@Valid CategoryPayment category) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPaymentsByCategoryType'");
+    public List<Payment> getPaymentsByYear(int year) throws Exception {
+        List<Payment> payments = paymentRepository.findByYear(year);
+        return payments;
+    }
+
+    @Override
+    public List<Payment> getPaymentsByMonth(int month) throws Exception {
+        List<Payment> payments = paymentRepository.findByMonth(month);
+        return payments;
     }
 
 
     @Override
-    public List<Payment> getPaymentsByYear(String year) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPaymentsByYear'");
+    public List<Payment> getPaymentsByStatus(@Valid PaymentStatus Status) throws Exception {
+        List<Payment> payments = paymentRepository.findByStatus(Status);
+        return payments;
     }
 
 
     @Override
-    public List<Payment> getPaymentsByMonth(String month) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPaymentsByMonth'");
+    public List<Payment> getPaymentsByYearAndMonth(int year, int month) throws Exception {
+        List<Payment> payments = paymentRepository.findByMonthAndYear(month, year);
+        return payments;
     }
 
 
     @Override
-    public List<Payment> getPaymentsByYearAndMonth(String month) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPaymentsByYearAndMonth'");
-    }
-
-
-    @Override
-    public void createPayment() throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createPayment'");
+    public void createPayment(Payment payment) throws Exception {
+        paymentRepository.save(payment);
     }
 
 
@@ -78,6 +79,11 @@ public class PaymentService implements IPaymentService {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deletePaymentById'");
     }
+
+
+ 
+
+    
 
 
     

@@ -8,12 +8,12 @@ public interface IPaymentService {
     
     List<Payment> getAllPayments();
     Payment getPaymentById(Long id) throws Exception;
-    List<Payment> getPaymentsByCategory(@Valid CategoryPayment category) throws Exception;
-    List<Payment> getPaymentsByYear(String year) throws Exception;
-    List<Payment> getPaymentsByMonth(String month) throws Exception;
-    List<Payment> getPaymentsByYearAndMonth(String month) throws Exception;
+    List<Payment> getPaymentsByStatus(@Valid PaymentStatus Status) throws Exception;
+    List<Payment> getPaymentsByYear(int year) throws Exception;
+    List<Payment> getPaymentsByMonth(int month) throws Exception;
+    List<Payment> getPaymentsByYearAndMonth(int year, int month) throws Exception;
 
-    void createPayment() throws Exception;
+    void createPayment(Payment payment) throws Exception;
     void editPayment(Payment payment) throws Exception;
     void deletePaymentById(Long payment) throws Exception;
 }

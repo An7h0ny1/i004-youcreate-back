@@ -1,7 +1,6 @@
 package com.igrowker.miniproject.Payment;
 
-import java.sql.Date;
-
+import java.time.Instant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,8 +31,14 @@ public class Payment {
 
     @PastOrPresent
     @Column(name = "date_payment")
-    private Date date;
+    private Instant date;
+
+    @Column(name = "service_name")
+    private String service;
+
+    @Column(name = "status")
+    private PaymentStatus status;
 
     @Column(name = "category")
-    private CategoryPayment category;
+    private PaymentMethod category;
 }
