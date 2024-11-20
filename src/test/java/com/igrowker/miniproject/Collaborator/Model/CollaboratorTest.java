@@ -30,7 +30,7 @@ public class CollaboratorTest {
                 .id(1L)
                 .name("John Doe")
                 .service("CEO")
-                .amount(500)
+                .amount(500D)
                 .user(user)
                 .build();
 
@@ -39,7 +39,7 @@ public class CollaboratorTest {
         assertEquals(1L, collaborator.getId());
         assertEquals("John Doe", collaborator.getName());
         assertEquals("CEO", collaborator.getService());
-        assertEquals(500, collaborator.getAmount());
+        assertEquals(500D, collaborator.getAmount());
         assertEquals(1L, user.getId());
     }
 }

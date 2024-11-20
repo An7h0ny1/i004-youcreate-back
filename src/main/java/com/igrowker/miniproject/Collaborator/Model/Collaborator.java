@@ -36,7 +36,7 @@ public class Collaborator {
 
     @NotNull(message = "Amount is required")
     @Column(name = "amount")
-    private int amount;
+    private Double amount;
 
     @NotNull(message = "User is required")
     @ManyToOne

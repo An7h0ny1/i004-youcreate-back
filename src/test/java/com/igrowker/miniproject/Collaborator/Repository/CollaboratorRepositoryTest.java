@@ -43,7 +43,7 @@ public class CollaboratorRepositoryTest {
         collaborator = Collaborator.builder()
                 .name("Felipe Bolaños")
                 .service("Developer")
-                .amount(1000)
+                .amount(1000D)
                 .user(userEntity)
                 .build();
         collaborator = collaboratorRepository.save(collaborator);
@@ -62,7 +62,7 @@ public class CollaboratorRepositoryTest {
         assertEquals(this.collaborator.getId(), collaborator.getId());
         assertEquals("Felipe Bolaños", collaborator.getName());
         assertEquals("Developer", collaborator.getService());
-        assertEquals(1000, collaborator.getAmount());
+        assertEquals(1000D, collaborator.getAmount());
         assertEquals(userEntity.getId(), collaborator.getUser().getId());
     }
 
@@ -76,7 +76,7 @@ public class CollaboratorRepositoryTest {
         assertEquals(this.collaborator.getId(), collaborator.get().getId());
         assertEquals("Felipe Bolaños", collaborator.get().getName());
         assertEquals("Developer", collaborator.get().getService());
-        assertEquals(1000, collaborator.get().getAmount());
+        assertEquals(1000D, collaborator.get().getAmount());
         assertEquals(userEntity.getId(), collaborator.get().getUser().getId());
     }
 }
