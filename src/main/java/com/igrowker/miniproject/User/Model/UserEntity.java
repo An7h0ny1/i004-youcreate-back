@@ -1,6 +1,9 @@
 package com.igrowker.miniproject.User.Model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.igrowker.miniproject.Collaborator.Model.Collaborator;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,6 +46,8 @@ public class UserEntity {
 
     private String country;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Collaborator> collaborators;
 
     @Column(name = "is_enabled")
     private boolean isEnabled;
