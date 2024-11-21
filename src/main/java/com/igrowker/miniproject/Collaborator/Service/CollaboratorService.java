@@ -14,6 +14,10 @@ import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class CollaboratorService {
 
@@ -23,6 +27,17 @@ public class CollaboratorService {
     public CollaboratorService(CollaboratorRepository collaboratorRepository, UserRepository userRepository) {
         this.collaboratorRepository = collaboratorRepository;
         this.userRepository = userRepository;
+    }
+
+    public List<CollaboratorEntityResponseDTO> getCollaborators(Long id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Usuario con id " + id + " no encontrado"));
+
+        List<Collaborator> collaborators = collaboratorRepository.findByUserId(id);
+
+        return collaborators.stream()
+                .map(this::entityToDTO)
+                .collect(Collectors.toList());
     }
 
     public CollaboratorEntityResponseDTO getCollaborator(Long id) {
@@ -93,6 +108,16 @@ public class CollaboratorService {
                 .orElseThrow(() -> new CollaboratorNotFoundException("Colaborador con id " + id + " no encontrado"));
 
         collaboratorRepository.delete(collaborator);
+    }
+
+    public CollaboratorEntityResponseDTO entityToDTO(Collaborator collaborator) {
+        return new CollaboratorEntityResponseDTO(
+                collaborator.getId(),
+                collaborator.getName(),
+                collaborator.getService(),
+                collaborator.getAmount(),
+                collaborator.getUser().getId()
+        );
     }
 
     public void validateCollaboratorCreateFields(CollaboratorCreateRequestDTO collaboratorCreateRequestDTO) {
