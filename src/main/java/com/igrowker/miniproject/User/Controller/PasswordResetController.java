@@ -1,6 +1,7 @@
 package com.igrowker.miniproject.User.Controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,11 +42,15 @@ public class PasswordResetController {
     
 
     @PostMapping("/{email}")
+    @Tag(name = "Password Reset", description = "API for user password reset.")
     @Operation(
-            summary = "Send Email Reset",
-            description = "Send Email Reset",
-            responses = {
-                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Send Email Reset")
+            summary = "Password Reset",
+            description = "Send a password reset email.",
+            responses ={
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Email sent successfully"
+                    )
             }
     )
     public ResponseEntity<String> sendResetEmail(@PathVariable String email) {
@@ -60,11 +65,15 @@ public class PasswordResetController {
     }
 
     @PatchMapping("/{token}")
+    @Tag(name = "Password Reset", description = "API for user password reset.")
     @Operation(
-            summary = "Reset Password",
-            description = "Reset Password",
-            responses = {
-                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Reset Password")
+            summary = "Password Reset",
+            description = "Update a user password.",
+            responses ={
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Password updated successfully"
+                    )
             }
     )
     public ResponseEntity<?> resetPassword(@org.springframework.web.bind.annotation.RequestBody UserReset user, @PathVariable String token)  {
