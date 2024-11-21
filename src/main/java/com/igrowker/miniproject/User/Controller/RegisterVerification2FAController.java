@@ -1,5 +1,8 @@
 package com.igrowker.miniproject.User.Controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/verifyRegister")
+@Tag(name = "Register Verification", description = "Register Verification API")
 public class RegisterVerification2FAController {
 
     @Autowired
@@ -31,6 +35,17 @@ public class RegisterVerification2FAController {
     }
 
     @PostMapping("/{email}")
+    @Tag(name = "Register Verification", description = "API for user registration verification.")
+    @Operation(
+            summary = "Register Verification",
+            description = "Send a registration verification email.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Email sent successfully"
+                    )
+            }
+    )
     public ResponseEntity<?> sendEmailfor2FAVerification(@PathVariable String email) {
 
         Optional<RegisterVerification2FA> register = registerVerification2FAService.validateEmail(email);
@@ -47,6 +62,17 @@ public class RegisterVerification2FAController {
     }
 
     @PostMapping("/verificar-2fa")
+    @Tag(name = "Register Verification", description = "API for user registration verification 2FA.")
+    @Operation(
+            summary = "Register Verification 2FA",
+            description = "verify email and token for user registration.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Verification completed successfully"
+                    )
+            }
+    )
     public ResponseEntity<?> verificarCodigo2FA(@org.springframework.web.bind.annotation.RequestBody TwoFARegisterVerificationDTO body) {
 
         try {

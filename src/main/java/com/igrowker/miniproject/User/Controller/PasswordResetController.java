@@ -1,5 +1,8 @@
 package com.igrowker.miniproject.User.Controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.igrowker.miniproject.User.Exception.PasswordMismatchException;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/reset")
+@Tag(name = "Password Reset", description = "Password Reset API")
 public class PasswordResetController {
 
     @Autowired
@@ -38,6 +42,17 @@ public class PasswordResetController {
     
 
     @PostMapping("/{email}")
+    @Tag(name = "Password Reset", description = "API for user password reset.")
+    @Operation(
+            summary = "Password Reset",
+            description = "Send a password reset email.",
+            responses ={
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Email sent successfully"
+                    )
+            }
+    )
     public ResponseEntity<String> sendResetEmail(@PathVariable String email) {
 
         try {
@@ -50,6 +65,17 @@ public class PasswordResetController {
     }
 
     @PatchMapping("/{token}")
+    @Tag(name = "Password Reset", description = "API for user password reset.")
+    @Operation(
+            summary = "Password Reset",
+            description = "Update a user password.",
+            responses ={
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Password updated successfully"
+                    )
+            }
+    )
     public ResponseEntity<?> resetPassword(@org.springframework.web.bind.annotation.RequestBody UserReset user, @PathVariable String token)  {
         try {
             boolean status = senderResetService.validate(token, user.getEmail(), user.getPassword());

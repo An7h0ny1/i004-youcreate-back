@@ -5,6 +5,7 @@ import com.igrowker.miniproject.User.Dto.AuthCreateUserRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthLoginRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseRegisterDto;
+import com.igrowker.miniproject.User.Service.RegisterVerification2FAService;
 import com.igrowker.miniproject.User.Service.UserDetailsServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,6 +37,8 @@ public class AuthController {
     private final TokenBlacklist tokenBlacklist;
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+
+    private final RegisterVerification2FAService registerVerification2FAService;
 
     @PostMapping("/login")
     @Tag(name = "Authentication", description = "API for user authentication.")
@@ -104,8 +107,9 @@ public class AuthController {
                     )
             )
     )
-    public ResponseEntity<?> register(@RequestBody @Valid AuthCreateUserRequestDto authCreateUserDto) {
+    public ResponseEntity<?> register(@RequestBody @Valid AuthCreateUserRequestDto authCreateUserDto) throws Exception {
             AuthResponseRegisterDto response = this.userDetailsServiceImpl.createUser(authCreateUserDto);
+            registerVerification2FAService.sendEmailForVerification2FA(authCreateUserDto.getEmail());
             return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
