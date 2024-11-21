@@ -37,7 +37,6 @@ public class AuthController {
     private final TokenBlacklist tokenBlacklist;
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
-
     private final RegisterVerification2FAService registerVerification2FAService;
 
     @PostMapping("/login")
@@ -109,7 +108,7 @@ public class AuthController {
     )
     public ResponseEntity<?> register(@RequestBody @Valid AuthCreateUserRequestDto authCreateUserDto) throws Exception {
             AuthResponseRegisterDto response = this.userDetailsServiceImpl.createUser(authCreateUserDto);
-            registerVerification2FAService.sendEmailForVerification2FA(authCreateUserDto.getEmail());
+            registerVerification2FAService.sendEmailForVerification2FA(authCreateUserDto.getEmail());    
             return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
