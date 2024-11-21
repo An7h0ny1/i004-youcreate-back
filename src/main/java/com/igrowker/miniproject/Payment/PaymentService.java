@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 
 @Service
@@ -30,9 +29,6 @@ public class PaymentService implements IPaymentService {
         }
         throw new PaymentNotFoundException("No se encontro el pago de id:" + id);
     }
-
-
-
 
     @Override
     public List<Payment> getPaymentsByYear(int year) throws Exception {
@@ -68,17 +64,68 @@ public class PaymentService implements IPaymentService {
 
 
     @Override
-    public void editPayment(Payment payment) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'editPayment'");
-    }
+    public void editPayment(Long id, Payment payment) throws Exception {
+        Optional<Payment> paymentOPT = paymentRepository.findById(id);
 
+        if (paymentOPT.isPresent()) {
+            
+            Payment paymentRegister = paymentOPT.get();
+
+            paymentRegister.setAmount(payment.getAmount());
+            paymentRegister.setCategory(payment.getCategory());
+            paymentRegister.setService(payment.getService());
+            paymentRegister.setStatus(payment.getStatus());
+            paymentRegister.setDate(payment.getDate());
+            paymentRegister.setCollaborator_id(payment.getCollaborator_id());
+            
+            paymentRepository.save(paymentRegister);
+            return;
+        }
+        throw new PaymentNotFoundException("No se ha encontrado a ese pago en el sistema");
+    }
 
     @Override
-    public void deletePaymentById(Long payment) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deletePaymentById'");
+    public void partiallyEditPayment(Long id, Payment payment) throws Exception {
+        Optional<Payment> paymentOPT = paymentRepository.findById(id);
+
+        if (paymentOPT.isPresent()) {
+            
+            Payment paymentRegister = paymentOPT.get();
+
+            if (payment.getService() != null) 
+                paymentRegister.setService(payment.getService());
+            
+
+            if (payment.getAmount() != null) 
+                paymentRegister.setAmount(payment.getAmount());
+            
+          
+            if (payment.getStatus() != null) 
+                paymentRegister.setStatus(payment.getStatus());
+            
+
+            if (payment.getCategory() != null) 
+                paymentRegister.setCategory(payment.getCategory());
+            
+            if (payment.getDate() != null) 
+                paymentRegister.setDate(payment.getDate());    
+            
+            if (payment.getCollaborator_id() != null) 
+                paymentRegister.setCollaborator_id(payment.getCollaborator_id());   
+            
+            paymentRepository.save(paymentRegister);
+            return;
+        }
+        throw new PaymentNotFoundException("No se ha encontrado a ese pago en el sistema");
     }
+
+    @Override
+    public void deletePaymentById(Long id) throws Exception {
+        paymentRepository.deleteById(id);
+    }
+
+
+    
 
 
  

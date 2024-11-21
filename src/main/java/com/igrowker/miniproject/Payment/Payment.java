@@ -27,18 +27,18 @@ public class Payment {
 
     @Min(value = 0, message = "el monto debe ser mayor o igual a 0")
     @Column(name = "amount")
-    private double amount;
+    private Double amount;
 
     @PastOrPresent
-    @Column(name = "date_payment")
+    @Column(name = "date_payment", nullable = false)
     private Instant date;
 
-    @Column(name = "service_name")
+    @Column(name = "service_name", nullable = false)
     private String service;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private PaymentStatus status;
 
-    @Column(name = "category")
+    @Column(name = "category", nullable = false)
     private PaymentMethod category;
 }

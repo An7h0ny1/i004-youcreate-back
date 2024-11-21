@@ -14,11 +14,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 
@@ -32,6 +35,11 @@ public class PaymentController {
     @GetMapping("")
     @Tag(name = "Payment", description = "API for get payments")
     @Operation(summary = "Get all payments", description = "Get all payments data.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "no hay pagos registrados"),
+        @ApiResponse(responseCode = "200", description = "ok! Se devuelven los pagos")
+
+    })
     public ResponseEntity<List<Payment>> getAllPayments() {
         List<Payment> payments = paymentService.getAllPayments();
         return (paymentService.getAllPayments().isEmpty()) ? ResponseEntity.ok(payments): ResponseEntity.noContent().build();
@@ -110,9 +118,37 @@ public class PaymentController {
         @ApiResponse(responseCode = "400", description = "bad request, el pago es invalido"),
         @ApiResponse(responseCode = "200", description = "ok! Se crea el nuevo pago")
     })
-    public  ResponseEntity<?>  CreatePayment(@Valid Payment payment) throws Exception {
+    public  ResponseEntity<?>  CreatePayment(@RequestBody @Valid Payment payment) throws Exception {
         paymentService.createPayment(payment);
         return ResponseEntity.ok(payment);
+    }
+
+    @PutMapping("{id}")
+    @Tag(name = "Payment", description = "API for get payments")
+    @Operation(summary = "Edit a payment", description = "You can edit a payment")
+    @ApiResponses({
+        @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
+        @ApiResponse(responseCode = "400", description = "bad request, el pago es invalido"),
+        @ApiResponse(responseCode = "200", description = "ok! Se edito el pago correctamente"),
+        @ApiResponse(responseCode = "404", description = "pago no encontrado"),
+    })
+    public ResponseEntity<?> editPayment(@PathVariable Long id, @RequestBody Payment payment) throws Exception{
+        paymentService.editPayment(id, payment);
+        return ResponseEntity.ok(payment);
+    }
+
+    @DeleteMapping("{id}")
+    @Tag(name = "Payment", description = "API for get payments")
+    @Operation(summary = "Delete a payment", description = "You can delete a payment")
+    @ApiResponses({
+        @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
+        @ApiResponse(responseCode = "400", description = "bad request, el pago es invalido"),
+        @ApiResponse(responseCode = "200", description = "ok! Se elimino el pago correctamente"),
+        @ApiResponse(responseCode = "404", description = "pago no encontrado"),
+    })
+    public ResponseEntity<?> deletePaymnet(@PathVariable Long id) throws Exception{
+        paymentService.deletePaymentById(id);
+        return ResponseEntity.ok("Eliminacion correcta!");
     }
     
 

@@ -14,6 +14,7 @@ public interface IPaymentService {
     List<Payment> getPaymentsByYearAndMonth(int year, int month) throws Exception;
 
     void createPayment(Payment payment) throws Exception;
-    void editPayment(Payment payment) throws Exception;
-    void deletePaymentById(Long payment) throws Exception;
+    void editPayment(Long id, Payment payment) throws Exception;
+    void partiallyEditPayment(Long id, Payment payment) throws Exception;
+    void deletePaymentById(Long id) throws Exception;
 }
