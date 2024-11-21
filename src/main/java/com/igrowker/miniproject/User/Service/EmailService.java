@@ -23,12 +23,12 @@ public class EmailService {
     public UUID sendResetPassword(UserEntity user, String email){
 
         try {
-            UUID token = UUID.randomUUID();
+            UUID token = generateResetPasswordToken();
             SimpleMailMessage message = new SimpleMailMessage();
 
             message.setTo(email);
             message.setSubject("Email Verification Code for password reset");
-            message.setText("Your verification code is: "+ host + token.toString());
+            message.setText("Your reset token code is: " + token.toString());
             mailSender.send(message);
             return token;
         } catch (Exception e) {
@@ -38,17 +38,25 @@ public class EmailService {
 
     public String sendEmailForVerification2FA(String email){
         try {
-            Integer token = new Random().nextInt(9000) + 1000;
+            Integer token = generateRandom2FAToken();
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(email);
             message.setSubject("Email Verification Code for password reset");
-            message.setText("Your register verification code is: "+ host + token.toString());
+            message.setText("Your register verification code is: " + token.toString());
             mailSender.send(message);
             return token.toString();
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    private Integer generateRandom2FAToken(){
+        return new Random().nextInt(9000) + 1000;
+    }
+
+    private UUID generateResetPasswordToken(){
+        return UUID.randomUUID();
     }
 
     
