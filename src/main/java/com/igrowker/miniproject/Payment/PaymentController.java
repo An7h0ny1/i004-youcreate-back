@@ -66,7 +66,7 @@ public class PaymentController {
         @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
         @ApiResponse(responseCode = "400", description = "bad request error en obtener los estados")
     })
-    public ResponseEntity<Api_Response<List<Payment>>>  getPaymentBystatus(@RequestParam PaymentStatus status) throws Exception {
+    public ResponseEntity<Api_Response<List<Payment>>>  getPaymentBystatus(@RequestParam @Valid PaymentStatus status) throws Exception {
         List<Payment> payments = paymentService.getPaymentsByStatus(status);
         return ResponseEntity.ok(new Api_Response<>(payments, "pagos encontrados con exito!", 200));
     }
@@ -132,7 +132,7 @@ public class PaymentController {
         @ApiResponse(responseCode = "200", description = "ok! Se edito el pago correctamente"),
         @ApiResponse(responseCode = "404", description = "pago no encontrado"),
     })
-    public ResponseEntity<?> editPayment(@PathVariable Long id, @RequestBody Payment payment) throws Exception{
+    public ResponseEntity<?> editPayment(@PathVariable Long id, @RequestBody @Valid Payment payment) throws Exception{
         paymentService.editPayment(id, payment);
         return ResponseEntity.ok(payment);
     }

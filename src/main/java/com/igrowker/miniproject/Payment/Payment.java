@@ -7,9 +7,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -25,8 +31,9 @@ public class Payment {
     @Column(nullable = false, name = "collaborator_id")
     private Long collaborator_id;
 
-    @Min(value = 0, message = "el monto debe ser mayor o igual a 0")
+    @DecimalMin(value = "0.1", message = "el monto debe ser mayor o igual a 0")
     @Column(name = "amount")
+    @NotNull
     private Double amount;
 
     @PastOrPresent
