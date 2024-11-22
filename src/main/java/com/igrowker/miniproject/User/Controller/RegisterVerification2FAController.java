@@ -5,9 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.igrowker.miniproject.User.Dto.TwoFARegisterVerificationDTO;
 import com.igrowker.miniproject.User.Model.RegisterVerification2FA;
+import com.igrowker.miniproject.User.Service.IRegisterVerification2FAService;
 import com.igrowker.miniproject.User.Service.RegisterVerification2FAService;
-
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class RegisterVerification2FAController {
 
     @Autowired
-    private RegisterVerification2FAService registerVerification2FAService;
+    private IRegisterVerification2FAService registerVerification2FAService;
 
     @GetMapping("")
     public List<RegisterVerification2FA> getAllRegisters() throws Exception {

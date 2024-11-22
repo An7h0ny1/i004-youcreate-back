@@ -2,6 +2,7 @@ package com.igrowker.miniproject.User.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.igrowker.miniproject.User.Exception.PasswordMismatchException;
 import com.igrowker.miniproject.User.Model.PasswordReset;
 import com.igrowker.miniproject.User.Service.PasswordResetService;
 
@@ -49,17 +50,27 @@ public class PasswordResetController {
     }
 
     @PatchMapping("/{token}")
-    public ResponseEntity<String> resetPassword(@org.springframework.web.bind.annotation.RequestBody UserReset user, @PathVariable String token) throws Exception {
-
-        boolean status = senderResetService.validate(token, user.getEmail(), user.getPassword());
-        return (status) ? ResponseEntity.ok("Se ha actualizado correctamente") : ResponseEntity.badRequest().build();
+    public ResponseEntity<?> resetPassword(@org.springframework.web.bind.annotation.RequestBody UserReset user, @PathVariable String token)  {
+        try {
+            boolean status = senderResetService.validate(token, user.getEmail(), user.getPassword());
+            if (!status) return ResponseEntity.ok("el token es invalido");
+            return ResponseEntity.ok("Se ha actualizado correctamente");
+        } catch(IllegalStateException exception){
+            return ResponseEntity.ok(exception.getMessage());
+        }  catch(PasswordMismatchException e){
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+        catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+       
 
     }
 
 }
 
 @Data
-class UserReset{
+class UserReset {
     String email;
     String password;
 }

@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -15,17 +16,19 @@ public class EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
-    private final String host = "http//localhost:8080/reset/";
+    
+    @Value("${app.host}")
+    private String host;
 
     public UUID sendResetPassword(UserEntity user, String email){
 
         try {
-            UUID token = UUID.randomUUID();
+            UUID token = generateResetPasswordToken();
             SimpleMailMessage message = new SimpleMailMessage();
 
             message.setTo(email);
             message.setSubject("Email Verification Code for password reset");
-            message.setText("Your verification code is: "+ host + token.toString());
+            message.setText("Your reset token code is: " + token.toString());
             mailSender.send(message);
             return token;
         } catch (Exception e) {
@@ -35,17 +38,25 @@ public class EmailService {
 
     public String sendEmailForVerification2FA(String email){
         try {
-            Integer token = new Random().nextInt(9000) + 1000;
+            Integer token = generateRandom2FAToken();
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(email);
             message.setSubject("Email Verification Code for password reset");
-            message.setText("Your register verification code is: "+ host + token.toString());
+            message.setText("Your register verification code is: " + token.toString());
             mailSender.send(message);
             return token.toString();
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    private Integer generateRandom2FAToken(){
+        return new Random().nextInt(9000) + 1000;
+    }
+
+    private UUID generateResetPasswordToken(){
+        return UUID.randomUUID();
     }
 
     

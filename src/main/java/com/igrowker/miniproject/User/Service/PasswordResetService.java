@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.igrowker.miniproject.User.Exception.PasswordMismatchException;
+import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import com.igrowker.miniproject.User.Model.PasswordReset;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.PasswordResetRepository;
@@ -24,6 +26,8 @@ public class PasswordResetService {
     @Autowired
     private EmailService mailSender;
 
+    
+
     public void sendEmailReset(String email) throws Exception {
         Optional<UserEntity> user = userRepository.findByEmail(email);
 
@@ -39,7 +43,7 @@ public class PasswordResetService {
             resetrepository.save(reset);
 
         } else {
-            throw new RuntimeException("No se ha encontrado a un usuario con ese mail");
+            throw new UserNotFoundException("No se ha encontrado a un usuario con ese mail");
         }
 
     }
@@ -49,24 +53,36 @@ public class PasswordResetService {
         if (passwordreset.getExpired_at().isBefore(LocalDateTime.now())) { // si fecha de expiracion < momento actual
             return false;
         }
+        if (!token.equals(passwordreset.getToken().toString())) {
+            return false;
+        }
         return true;
     }
 
     public boolean validate(String token, String email, String password) throws Exception {
 
         Optional<PasswordReset> passwordreset = resetrepository.findByEmail(email);
-        System.out.println("el email es " + email);
         if (passwordreset.isPresent()) {
+
+            PasswordReset pass = passwordreset.get();
+            if (pass.getStatus() != null) 
+                throw new IllegalStateException("Tu token ya fue utilizado");
+
             if (!isValidToken(token, passwordreset.get()))
                 return false;
 
             UserEntity user = userRepository.findByEmail(email).get();
+
+            
             user.setPassword(password);
+            pass.setStatus("USED");
+
+            resetrepository.save(pass);
             userRepository.save(user);
             
             return true;
         }
-        return false;
+        throw new PasswordMismatchException("Ese usuario no tiene una solicitud de reset");
 
     }
 
