@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -102,15 +101,6 @@ public class UserService {
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
     }
-
-    /*
-    public UserEntity registerUser(UserEntity userEntity) {
-        // Obtenga el IVA según el país y configúrela
-        Double taxRate = taxService.getTaxRate(userEntity.getCountry());
-        userEntity.setTaxRate(taxRate);
-        return userRepository.save(userEntity);
-    }
-     */
 
     public UserEntity getUserByUsername(String username) {
         return userRepository.findByUserName(username).orElse(null);
