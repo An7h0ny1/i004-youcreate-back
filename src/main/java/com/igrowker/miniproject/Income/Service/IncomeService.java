@@ -38,7 +38,7 @@ public class IncomeService {
     }
 
     public IncomeEntityResponseDTO getIncome(Long id) {
-        validateIncomeId(id);
+        //validateIncomeId(id);
 
         return incomeRepository.findById(id)
                 .map(income -> new IncomeEntityResponseDTO(
@@ -76,7 +76,7 @@ public class IncomeService {
     }
 
     public IncomeEntityResponseDTO updateIncome(Long id, IncomeUpdateRequestDTO incomeUpdateRequestDTO) {
-        validateIncomeId(id);
+        //validateIncomeId(id);
 
         Income income = incomeRepository.findById(id)
                 .orElseThrow(() -> new IncomeNotFoundException("Colaborador con id " + id + " no encontrado"));
@@ -99,7 +99,7 @@ public class IncomeService {
     }
 
     public void deleteIncome(Long id) {
-        validateIncomeId(id);
+        //validateIncomeId(id);
 
         Income income = incomeRepository.findById(id)
                 .orElseThrow(() -> new IncomeNotFoundException("Ingreso con id " + id + " no encontrado"));
@@ -147,9 +147,9 @@ public class IncomeService {
         }
     }
 
-    public void validateIncomeId(Long id) {
-        if (id <= 0) {
-            throw new InvalidIncomeIdException("El id de ingreso debe ser mayor a 0");
-        }
-    }
+//    public void validateIncomeId(Long id) {
+//        if (id <= 0) {
+//            throw new InvalidIncomeIdException("El id de ingreso debe ser mayor a 0");
+//        }
+//    }
 }

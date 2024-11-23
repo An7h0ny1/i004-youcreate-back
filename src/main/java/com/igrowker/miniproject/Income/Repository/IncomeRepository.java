@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface IncomeRepository extends JpaRepository<Income, Long> {
 
-    Optional<Income> findByName(String origin);
+    Optional<Income> findByOrigin(String origin);
     List<Income> findByUserId(Long userId);
 }

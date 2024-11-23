@@ -26,7 +26,7 @@ public class IncomeController {
     @Autowired
     private final IncomeService incomeService;
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     @Tag(name = "Income", description = "API for income data.")
     @Operation(summary = "Get Incomes", description = "Get all Incomes by user id.")
     @ApiResponses({

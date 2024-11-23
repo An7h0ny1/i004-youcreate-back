@@ -30,7 +30,6 @@ public class Income {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Amount is required")
     @Column(name = "amount")
     private double amount;
 
