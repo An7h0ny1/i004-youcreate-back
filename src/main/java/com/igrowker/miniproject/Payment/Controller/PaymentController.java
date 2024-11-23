@@ -1,6 +1,11 @@
-package com.igrowker.miniproject.Payment;
+package com.igrowker.miniproject.Payment.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.igrowker.miniproject.Payment.DTO.PaymentDTO;
+import com.igrowker.miniproject.Payment.Model.Payment;
+import com.igrowker.miniproject.Payment.Model.PaymentStatus;
+import com.igrowker.miniproject.Payment.Service.IPaymentService;
 import com.igrowker.miniproject.Utils.Api_Response;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +47,7 @@ public class PaymentController {
     })
     public ResponseEntity<List<Payment>> getAllPayments() {
         List<Payment> payments = paymentService.getAllPayments();
-        return (paymentService.getAllPayments().isEmpty()) ? ResponseEntity.ok(payments): ResponseEntity.noContent().build();
+        return (!paymentService.getAllPayments().isEmpty()) ? ResponseEntity.ok(payments): ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -118,7 +123,7 @@ public class PaymentController {
         @ApiResponse(responseCode = "400", description = "bad request, el pago es invalido"),
         @ApiResponse(responseCode = "200", description = "ok! Se crea el nuevo pago")
     })
-    public  ResponseEntity<?>  CreatePayment(@RequestBody @Valid Payment payment) throws Exception {
+    public  ResponseEntity<?>  CreatePayment(@RequestBody @Valid PaymentDTO payment) throws Exception {
         paymentService.createPayment(payment);
         return ResponseEntity.ok(payment);
     }

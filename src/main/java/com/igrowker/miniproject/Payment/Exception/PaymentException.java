@@ -1,4 +1,4 @@
-package com.igrowker.miniproject.Payment;
+package com.igrowker.miniproject.Payment.Exception;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;

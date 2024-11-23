@@ -1,5 +1,8 @@
-package com.igrowker.miniproject.Payment;
+package com.igrowker.miniproject.Payment.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -7,6 +10,15 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.igrowker.miniproject.Collaborator.DTO.CollaboratorEntityResponseDTO;
+import com.igrowker.miniproject.Collaborator.Model.Collaborator;
+import com.igrowker.miniproject.Collaborator.Service.CollaboratorService;
+import com.igrowker.miniproject.Payment.DTO.PaymentDTO;
+import com.igrowker.miniproject.Payment.Exception.PaymentNotFoundException;
+import com.igrowker.miniproject.Payment.Model.Payment;
+import com.igrowker.miniproject.Payment.Model.PaymentMethod;
+import com.igrowker.miniproject.Payment.Model.PaymentStatus;
+import com.igrowker.miniproject.Payment.Repository.PaymentRepository;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 
 import jakarta.validation.ConstraintViolation;
@@ -19,6 +31,9 @@ public class PaymentService implements IPaymentService {
 
     @Autowired
     PaymentRepository paymentRepository;
+
+    @Autowired
+    private CollaboratorService collaboratorService;
 
     @Override
     public List<Payment> getAllPayments() {
@@ -65,10 +80,21 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public void createPayment(Payment payment) throws Exception {
-        if (payment == null) 
+    public void createPayment(PaymentDTO paymentR) throws Exception {
+        if (paymentR == null) 
             throw new NullPointerException("El pago no puede ser null");
         
+        CollaboratorEntityResponseDTO collaborator = collaboratorService.getCollaborator(paymentR.getCollaborator_id());
+        Payment payment = new Payment();
+        Instant date_now = Instant.now();
+
+        payment.setAmount(collaborator.amount());
+        payment.setCollaborator_id(collaborator.id());
+        payment.setService(collaborator.service());
+        payment.setDate(date_now);
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setCategory(paymentR.getCategory());
+        payment.setExpired_date(date_now.plus(30, ChronoUnit.DAYS));
         paymentRepository.save(payment);
     }
 
@@ -145,4 +171,5 @@ public class PaymentService implements IPaymentService {
             throw new IllegalArgumentException("El mes debe estar entre 1  y 12");
         }
     }
+
 }
