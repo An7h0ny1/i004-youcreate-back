@@ -1,21 +1,20 @@
 package com.igrowker.miniproject.User.Service;
-
+import com.igrowker.miniproject.TaxObligation.Service.TaxService;
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.UserRepository;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,12 +22,15 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final TaxService taxService;
+
     @Value("${upload.path}")
     private String uploadPath;
 
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, TaxService taxService) {
         this.userRepository = userRepository;
+        this.taxService = taxService;
     }
 
     public void saveUser(UserEntity userEntity) {
@@ -99,5 +101,18 @@ public class UserService {
 
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    /*
+    public UserEntity registerUser(UserEntity userEntity) {
+        // Obtenga el IVA según el país y configúrela
+        Double taxRate = taxService.getTaxRate(userEntity.getCountry());
+        userEntity.setTaxRate(taxRate);
+        return userRepository.save(userEntity);
+    }
+     */
+
+    public UserEntity getUserByUsername(String username) {
+        return userRepository.findByUserName(username).orElse(null);
     }
 }
