@@ -1,6 +1,7 @@
 package com.igrowker.miniproject.Income.DTO;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Data;
 
 import java.util.Date;
 
