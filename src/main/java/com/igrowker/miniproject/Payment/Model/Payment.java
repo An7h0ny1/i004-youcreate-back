@@ -5,6 +5,7 @@ import java.time.Instant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.igrowker.miniproject.Collaborator.Model.Collaborator;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @Table(name = "payment")
+@Nonnull
 public class Payment {
     
     @Id
