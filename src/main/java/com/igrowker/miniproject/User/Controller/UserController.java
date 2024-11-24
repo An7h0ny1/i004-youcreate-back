@@ -1,5 +1,4 @@
 package com.igrowker.miniproject.User.Controller;
-
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
@@ -13,14 +12,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-
 import java.io.IOException;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

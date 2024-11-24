@@ -35,7 +35,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @Min(value = 0, message = "el id debe ser mayor o igual a 0")
+    //@Min(value = 0, message = "el id debe ser mayor o igual a 0")
     private Long id;
 
     @Column(nullable = false, name = "collaborator_id")
