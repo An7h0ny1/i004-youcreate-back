@@ -1,10 +1,7 @@
 package com.igrowker.miniproject.Payment;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -19,8 +16,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.igrowker.miniproject.Collaborator.DTO.CollaboratorEntityResponseDTO;
-import com.igrowker.miniproject.Collaborator.Model.Collaborator;
 import com.igrowker.miniproject.Collaborator.Service.CollaboratorService;
 import com.igrowker.miniproject.Payment.DTO.PaymentDTO;
 import com.igrowker.miniproject.Payment.Exception.PaymentNotFoundException;
@@ -67,6 +62,7 @@ public class PaymentServiceTest {
         Mockito.verify(paymentRepository, Mockito.times(1)).save(payment);
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deberia lanzar un error al crear un pago por que es null")
     public void createPaymentButPaymentIsNull() throws Exception {

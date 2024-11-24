@@ -2,29 +2,19 @@ package com.igrowker.miniproject.Payment.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.igrowker.miniproject.Collaborator.DTO.CollaboratorEntityResponseDTO;
-import com.igrowker.miniproject.Collaborator.Model.Collaborator;
 import com.igrowker.miniproject.Collaborator.Service.CollaboratorService;
 import com.igrowker.miniproject.Payment.DTO.PaymentDTO;
 import com.igrowker.miniproject.Payment.Exception.PaymentNotFoundException;
 import com.igrowker.miniproject.Payment.Model.Payment;
-import com.igrowker.miniproject.Payment.Model.PaymentMethod;
 import com.igrowker.miniproject.Payment.Model.PaymentStatus;
 import com.igrowker.miniproject.Payment.Repository.PaymentRepository;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
-
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Valid;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
 
 @Service
 public class PaymentService implements IPaymentService {
