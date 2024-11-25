@@ -1,4 +1,4 @@
-package com.igrowker.miniproject.Payment;
+package com.igrowker.miniproject.Payment.Model;
 
 public enum PaymentMethod {
     BANK_TRANSFER,

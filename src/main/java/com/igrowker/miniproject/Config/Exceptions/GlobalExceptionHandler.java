@@ -1,9 +1,16 @@
 package com.igrowker.miniproject.Config.Exceptions;
 
+import com.igrowker.miniproject.Collaborator.Exception.BadCollaboratorBodyRequestException;
+import com.igrowker.miniproject.Collaborator.Exception.CollaboratorNotFoundException;
+import com.igrowker.miniproject.Collaborator.Exception.InvalidCollaboratorIdException;
+import com.igrowker.miniproject.Income.Exception.BadIncomeBodyRequestException;
+import com.igrowker.miniproject.Income.Exception.IncomeNotFoundException;
+import com.igrowker.miniproject.Income.Exception.InvalidIncomeIdException;
 import com.igrowker.miniproject.User.Exception.PasswordMismatchException;
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 import com.igrowker.miniproject.User.Exception.UserNotFoundException;
+import com.igrowker.miniproject.Utils.Api_Response;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -120,6 +127,34 @@ public class GlobalExceptionHandler {
     public ResponseEntity<UserProfileResponseDTO> handleUserNotFound(UserNotFoundException ex) {
         UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, null, null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({InvalidCollaboratorIdException.class, CollaboratorNotFoundException.class, BadCollaboratorBodyRequestException.class})
+    public ResponseEntity<Api_Response<Object>> handleCollaboratorExceptions(Exception ex) {
+        int statusCode;
+        if (ex instanceof InvalidCollaboratorIdException || ex instanceof BadCollaboratorBodyRequestException) {
+            statusCode = 400;
+        } else if (ex instanceof CollaboratorNotFoundException) {
+            statusCode = 404;
+        } else {
+            statusCode = 500;
+        }
+        return ResponseEntity.status(statusCode)
+                .body(new Api_Response<>(null, ex.getMessage(), statusCode));
+    }
+
+    @ExceptionHandler({InvalidIncomeIdException.class, IncomeNotFoundException.class, BadIncomeBodyRequestException.class})
+    public ResponseEntity<Api_Response<Object>> handleIncomeExceptions(Exception ex) {
+        int statusCode;
+        if (ex instanceof InvalidIncomeIdException || ex instanceof BadIncomeBodyRequestException) {
+            statusCode = 400;
+        } else if (ex instanceof IncomeNotFoundException) {
+            statusCode = 404;
+        } else {
+            statusCode = 500;
+        }
+        return ResponseEntity.status(statusCode)
+                .body(new Api_Response<>(null, ex.getMessage(), statusCode));
     }
 
 }
