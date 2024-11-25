@@ -1,6 +1,7 @@
 package com.igrowker.miniproject.Collaborator.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.igrowker.miniproject.Payment.Model.Payment;
 import com.igrowker.miniproject.User.Model.UserEntity;
 
 import jakarta.persistence.Column;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -43,4 +45,5 @@ public class Collaborator {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private UserEntity user;
+
 }

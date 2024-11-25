@@ -1,19 +1,24 @@
-package com.igrowker.miniproject.Payment;
+package com.igrowker.miniproject.Payment.Model;
 
 import java.time.Instant;
+
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 
 @Entity
 @Data
 @Table(name = "payment")
+@Nonnull
 public class Payment {
     
     @Id
@@ -25,13 +30,18 @@ public class Payment {
     @Column(nullable = false, name = "collaborator_id")
     private Long collaborator_id;
 
-    @Min(value = 0, message = "el monto debe ser mayor o igual a 0")
+    @DecimalMin(value = "0.1", message = "el monto debe ser mayor o igual a 0")
     @Column(name = "amount")
+    @NotNull
     private Double amount;
 
     @PastOrPresent
     @Column(name = "date_payment", nullable = false)
     private Instant date;
+
+    @Future
+    @Column(name = "date_expired", nullable = false)
+    private Instant expired_date;
 
     @Column(name = "service_name", nullable = false)
     private String service;
@@ -41,4 +51,5 @@ public class Payment {
 
     @Column(name = "category", nullable = false)
     private PaymentMethod category;
+
 }

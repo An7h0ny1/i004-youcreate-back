@@ -1,4 +1,4 @@
-package com.igrowker.miniproject.Payment;
+package com.igrowker.miniproject.Payment.Exception;
 
 public class PaymentNotFoundException extends RuntimeException {
     public PaymentNotFoundException(String message) {

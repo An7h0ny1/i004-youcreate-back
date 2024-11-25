@@ -1,10 +1,13 @@
-package com.igrowker.miniproject.Payment;
+package com.igrowker.miniproject.Payment.Repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.igrowker.miniproject.Payment.Model.Payment;
+import com.igrowker.miniproject.Payment.Model.PaymentStatus;
 
 import java.sql.Date;
 
