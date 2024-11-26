@@ -77,6 +77,7 @@ public class RegisterVerification2FAService implements IRegisterVerification2FAS
             registerVerification2FARepository.save(register_bdd);
             
             user.setEnabled(true);
+            user.setVerify(true);
             userRepository.save(user);
 
             return "OK";
