@@ -17,9 +17,14 @@ import java.util.Date;
 public class IncomeUpdateRequestDTO {
 
     @Positive(message = "Amount must be positive")
+    public Long id;
+
+    @Positive(message = "Amount must be positive")
     public double amount;
     @NotBlank(message = "Origin is required")
     public String origin;
     @NotNull(message = "Date is required")
-    public Date date;
+    public String date;
+    @NotBlank(message = "Category is required")
+    public String category;
 }

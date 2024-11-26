@@ -21,7 +21,9 @@ public class IncomeCreateRequestDTO {
     @NotBlank(message = "Origin is required")
     public String origin;
     @NotNull(message = "Date is required")
-    public Date date;
+    public String date;
+    @NotBlank(message = "Category is required")
+    public String category;
     @NotNull(message = "User id is required")
     public Long user_id;
 }
