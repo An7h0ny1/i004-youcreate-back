@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.Income.Service;
 
+import com.igrowker.miniproject.Collaborator.Repository.CollaboratorRepository;
 import com.igrowker.miniproject.Income.DTO.IncomeCreateRequestDTO;
 import com.igrowker.miniproject.Income.DTO.IncomeEntityResponseDTO;
 import com.igrowker.miniproject.Income.DTO.IncomeUpdateRequestDTO;
@@ -15,16 +16,37 @@ import com.igrowker.miniproject.User.Repository.UserRepository;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Data
 public class IncomeService {
 
-    private final IncomeRepository incomeRepository;
-    private final UserRepository userRepository;
+    private  final IncomeRepository incomeRepository;
+    private  final UserRepository userRepository;
+
+    public IncomeService(IncomeRepository incomeRepository, UserRepository userRepository) {
+        this.incomeRepository = incomeRepository;
+        this.userRepository = userRepository;
+    }
+
+    private Date convertStringToDate(String dateString) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            return formatter.parse(dateString);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Fecha inválida: " + dateString);
+        }
+    }
+
+    private void validarCategoria(String category) {
+        if (!category.equals("campaña") && !category.equals("colaboracion")) {
+            throw new IllegalArgumentException("Categoría inválida");
+        }
+    }
 
     public List<IncomeEntityResponseDTO> getIncomes(Long id) {
         UserEntity user = userRepository.findById(id)
@@ -40,12 +62,14 @@ public class IncomeService {
     public IncomeEntityResponseDTO getIncome(Long id) {
         //validateIncomeId(id);
 
+
         return incomeRepository.findById(id)
                 .map(income -> new IncomeEntityResponseDTO(
                         income.getId(),
                         income.getAmount(),
                         income.getOrigin(),
                         income.getDate(),
+                        income.getCategory(),
                         income.getUser().getId()
                 ))
                 .orElseThrow(() -> new IncomeNotFoundException("Ingreso con id " + id + " no encontrado"));
@@ -54,8 +78,13 @@ public class IncomeService {
     public IncomeEntityResponseDTO createIncome(IncomeCreateRequestDTO incomeCreateRequestDTO) {
         validateIncomeCreateFields(incomeCreateRequestDTO);
 
+        validarCategoria(incomeCreateRequestDTO.getCategory());
+
         UserEntity user = userRepository.findById(incomeCreateRequestDTO.getUser_id())
                 .orElseThrow(() -> new UserNotFoundException("Usuario con id " + incomeCreateRequestDTO.getUser_id() + " no encontrado"));
+
+        // Convertir la fecha de String a Date
+        Date date = convertStringToDate(incomeCreateRequestDTO.getDate());
 
         Income income = Income.builder()
                 .amount(incomeCreateRequestDTO.getAmount())
@@ -71,6 +100,7 @@ public class IncomeService {
                 income.getAmount(),
                 income.getOrigin(),
                 income.getDate(),
+                income.getCategory(),
                 income.getUser().getId()
         );
     }
@@ -78,14 +108,21 @@ public class IncomeService {
     public IncomeEntityResponseDTO updateIncome(Long id, IncomeUpdateRequestDTO incomeUpdateRequestDTO) {
         //validateIncomeId(id);
 
+        validarCategoria(incomeUpdateRequestDTO.getCategory());
+
         Income income = incomeRepository.findById(id)
-                .orElseThrow(() -> new IncomeNotFoundException("Colaborador con id " + id + " no encontrado"));
+                .orElseThrow(() -> new IncomeNotFoundException("Ingreso con id " + id + " no encontrado"));
 
         validateIncomeUpdateFields(incomeUpdateRequestDTO);
 
+        Date date = convertStringToDate(incomeUpdateRequestDTO.getDate());
+
+
+        income.setId(incomeUpdateRequestDTO.getId());
         income.setAmount(incomeUpdateRequestDTO.getAmount());
         income.setOrigin(incomeUpdateRequestDTO.getOrigin());
         income.setDate(incomeUpdateRequestDTO.getDate());
+        income.setCategory(incomeUpdateRequestDTO.getCategory());
 
         incomeRepository.save(income);
 
@@ -94,6 +131,7 @@ public class IncomeService {
                 income.getAmount(),
                 income.getOrigin(),
                 income.getDate(),
+                income.getCategory(),
                 income.getUser().getId()
         );
     }
@@ -104,15 +142,20 @@ public class IncomeService {
         Income income = incomeRepository.findById(id)
                 .orElseThrow(() -> new IncomeNotFoundException("Ingreso con id " + id + " no encontrado"));
 
-        incomeRepository.delete(income);
+        incomeRepository.deleteById(id);
     }
 
     public IncomeEntityResponseDTO entityToDTO(Income income) {
+
+        Date date = convertStringToDate(income.getDate());
+
+
         return new IncomeEntityResponseDTO(
                 income.getId(),
                 income.getAmount(),
                 income.getOrigin(),
                 income.getDate(),
+                income.getCategory(),
                 income.getUser().getId()
         );
     }
@@ -121,8 +164,9 @@ public class IncomeService {
         if (incomeCreateRequestDTO == null) {
             throw new BadIncomeBodyRequestException("El ingreso solicitado no puede ser nulo");
         }
+        Date date = convertStringToDate(incomeCreateRequestDTO.getDate());
 
-        validateIncomeFields(incomeCreateRequestDTO.getAmount(), incomeCreateRequestDTO.getOrigin(), incomeCreateRequestDTO.getDate());
+        validateIncomeFields(incomeCreateRequestDTO.getAmount(), incomeCreateRequestDTO.getOrigin(), date);
     }
 
     public void validateIncomeUpdateFields(IncomeUpdateRequestDTO incomeUpdateRequestDTO) {
@@ -130,7 +174,9 @@ public class IncomeService {
             throw new BadIncomeBodyRequestException("El ingreso solicitado no puede ser nulo");
         }
 
-        validateIncomeFields(incomeUpdateRequestDTO.getAmount(), incomeUpdateRequestDTO.getOrigin(), incomeUpdateRequestDTO.getDate());
+        Date date = convertStringToDate(incomeUpdateRequestDTO.getDate());
+
+        validateIncomeFields(incomeUpdateRequestDTO.getAmount(), incomeUpdateRequestDTO.getOrigin(), date);
     }
 
     private void validateIncomeFields(Double amount, String origin, Date date) {
