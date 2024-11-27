@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,7 +63,6 @@ public class IncomeService {
     public IncomeEntityResponseDTO getIncome(Long id) {
         //validateIncomeId(id);
 
-
         return incomeRepository.findById(id)
                 .map(income -> new IncomeEntityResponseDTO(
                         income.getId(),
@@ -90,6 +90,7 @@ public class IncomeService {
                 .amount(incomeCreateRequestDTO.getAmount())
                 .origin(incomeCreateRequestDTO.getOrigin())
                 .date(incomeCreateRequestDTO.getDate())
+                .category(incomeCreateRequestDTO.getCategory())
                 .user(user)
                 .build();
 
@@ -191,6 +192,23 @@ public class IncomeService {
         if (date == null) {
             throw new InvalidIncomeFieldException("El fecha del ingreso no puede estar vacío");
         }
+    }
+
+    public List<IncomeEntityResponseDTO> getIncomesByMonth(Long userId, int month, int year) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuario con id " + userId + " no encontrado"));
+
+        List<Income> incomes = incomeRepository.findByUserId(userId);
+
+        return incomes.stream()
+                .filter(income -> {
+                    //Date incomeDate = convertStringToDate(income.getDate());
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(convertStringToDate(income.getDate()));
+                    return calendar.get(Calendar.MONTH) + 1 == month && calendar.get(Calendar.YEAR) == year; // +1 porque los meses en Calendar son 0-indexados
+                })
+                .map(this::entityToDTO)
+                .collect(Collectors.toList());
     }
 
 //    public void validateIncomeId(Long id) {
