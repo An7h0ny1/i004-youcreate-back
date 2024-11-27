@@ -88,7 +88,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         String password = authDto.getPassword();
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("El usuario no se encuentra"));
         if(!userEntity.getVerify()){
-            throw new RuntimeException("El usuario no ha autenticado su cuenta");
+            throw new RuntimeException("El usuario no ha autenticado su cuenta aun");
         }
 
         Long id = userRepository.findByEmail(email)
