@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.Income.Controller;
 
+import com.igrowker.miniproject.Collaborator.Service.CollaboratorService;
 import com.igrowker.miniproject.Income.DTO.IncomeCreateRequestDTO;
 import com.igrowker.miniproject.Income.DTO.IncomeEntityResponseDTO;
 import com.igrowker.miniproject.Income.DTO.IncomeUpdateRequestDTO;
@@ -20,11 +21,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
+
 @RequestMapping("/api/income")
 public class IncomeController {
-    @Autowired
+
     private final IncomeService incomeService;
+
+    public IncomeController(IncomeService incomeService) {
+        this.incomeService = incomeService;
+    }
 
     @GetMapping("/user/{userId}")
     @Tag(name = "Income", description = "API for income data.")

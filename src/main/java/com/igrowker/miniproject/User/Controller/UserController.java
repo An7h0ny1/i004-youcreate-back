@@ -62,8 +62,6 @@ public class UserController {
         
         userService.saveUser(entity);
     }
-    
-
 
     @GetMapping("/{id}")
     @Tag(name = "User", description = "API for get user profile data.")
@@ -134,6 +132,32 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new Api_Response<>(null, "Hubo un error en el servidor", 500));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Tag(name = "DeleteUser", description = "API for delete user profile data.")
+    @Operation(summary = "Delete User", description = "Delete user profile by id.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuario eliminado satisfactoriamente"),
+            @ApiResponse(responseCode = "400", description = "El id del usuario debe ser mayor a 0"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("Usuario eliminado satisfactoriamente");
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuario no encontrado");
+        } catch (InvalidUserIdException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("El id del usuario debe ser mayor a 0");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Hubo un error en el servidor");
         }
     }
 

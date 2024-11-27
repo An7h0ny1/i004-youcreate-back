@@ -39,7 +39,12 @@ public class Income {
 
     @NotNull(message = "Date is required")
     @Column(name = "date")
-    private Date date;
+    private String date;
+
+    @NotNull(message = "Category is required")
+    @Column(name = "category")
+    private String category;
+
 
     @NotNull(message = "User is required")
     @ManyToOne

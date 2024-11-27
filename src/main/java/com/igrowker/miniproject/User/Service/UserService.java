@@ -98,6 +98,17 @@ public class UserService {
         return filePath.toString();
     }
 
+    public void deleteUser(Long id){
+        if (id <= 0) {
+            throw new InvalidUserIdException("El id del usuario debe ser mayor a 0");
+        }
+        UserEntity user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            throw new UserNotFoundException("Usuario con id " + id + " no encontrado");
+        }
+        userRepository.delete(user);
+    }
+
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
     }
