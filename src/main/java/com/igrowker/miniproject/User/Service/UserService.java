@@ -1,4 +1,5 @@
 package com.igrowker.miniproject.User.Service;
+import com.igrowker.miniproject.TaxObligation.Service.TaxNotificationService;
 import com.igrowker.miniproject.TaxObligation.Service.TaxService;
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
@@ -6,6 +7,7 @@ import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,16 +22,16 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-
-    private final TaxService taxService;
+    private final TaxNotificationService taxNotificationService;
 
     @Value("${upload.path}")
     private String uploadPath;
 
 
-    public UserService(UserRepository userRepository, TaxService taxService) {
+    @Autowired
+    public UserService(UserRepository userRepository, TaxNotificationService taxNotificationService) {
         this.userRepository = userRepository;
-        this.taxService = taxService;
+        this.taxNotificationService = taxNotificationService;
     }
 
     public void saveUser(UserEntity userEntity) {
@@ -102,7 +104,4 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public UserEntity getUserByUsername(String username) {
-        return userRepository.findByUserName(username).orElse(null);
-    }
 }
