@@ -87,6 +87,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public AuthResponseDto loginUser(@Valid AuthLoginRequestDto authDto) {
         String email = authDto.getEmail(); // Usar email como identificador
         String password = authDto.getPassword();
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("El usuario no se encuentra"));
+        if(!userEntity.getVerify()){
+            throw new RuntimeException("El usuario no ha autenticado su cuenta");
+        }
 
         Long id = userRepository.findByEmail(email)
                 .map(UserEntity::getId)

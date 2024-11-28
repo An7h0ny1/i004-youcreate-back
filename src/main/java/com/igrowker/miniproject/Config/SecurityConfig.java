@@ -6,6 +6,7 @@ import com.igrowker.miniproject.Config.Jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -47,6 +48,8 @@ public class SecurityConfig  {
 
                         //Rutas privadas
                         //.requestMatchers(HttpMethod.POST,"/auth/register").hasRole("ADMIN")
+
+                        //.requestMatchers(HttpMethod.POST, "/api/income/create").hasRole("A") // Permitir solo a usuarios con rol USER
 
                         //Cualquier otro endpoint está denegado
                         .anyRequest().permitAll()

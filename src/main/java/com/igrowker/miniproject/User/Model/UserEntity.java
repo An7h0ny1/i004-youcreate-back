@@ -34,6 +34,8 @@ public class UserEntity {
     @Transient
     private String confirmPassword;
 
+    private boolean verify = false;
+
     @Column(unique = true)
     @JsonProperty("email")
     private String email;
@@ -70,6 +72,10 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Income> incomes;
+
+    public boolean getVerify() {
+        return verify;
+    }
 
     /*@ManyToMany(fetch = FetchType.EAGER , targetEntity = Role.class, cascade = CascadeType.PERSIST)
     @JoinTable(name = "users_roles",

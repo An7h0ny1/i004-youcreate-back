@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.Income.Controller;
 
+import com.igrowker.miniproject.Collaborator.Service.CollaboratorService;
 import com.igrowker.miniproject.Income.DTO.IncomeCreateRequestDTO;
 import com.igrowker.miniproject.Income.DTO.IncomeEntityResponseDTO;
 import com.igrowker.miniproject.Income.DTO.IncomeUpdateRequestDTO;
@@ -20,11 +21,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
+
 @RequestMapping("/api/income")
 public class IncomeController {
-    @Autowired
+
     private final IncomeService incomeService;
+
+    public IncomeController(IncomeService incomeService) {
+        this.incomeService = incomeService;
+    }
 
     @GetMapping("/user/{userId}")
     @Tag(name = "Income", description = "API for income data.")
@@ -100,4 +105,17 @@ public class IncomeController {
                 .body(new Api_Response<>(null, "Ingreso eliminado correctamente", 200));
     }
 
+    @GetMapping("/filterByMonth")
+    @Tag(name = "Income", description = "API for filter incomes.")
+    @Operation(summary = "Obtener ingresos por mes",
+            description = "Este endpoint permite obtener todos los ingresos de un usuario específico para un mes y año determinados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de ingresos obtenida correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public List<IncomeEntityResponseDTO> filterIncomesByMonth(@RequestParam Long userId, @RequestParam int month, @RequestParam int year) {
+        return incomeService.getIncomesByMonth(userId, month, year);
+    }
 }

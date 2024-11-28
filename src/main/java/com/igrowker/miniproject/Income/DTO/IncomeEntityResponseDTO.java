@@ -5,12 +5,13 @@ import lombok.Data;
 
 import java.util.Date;
 
-    @JsonPropertyOrder({"id", "amount", "origin", "date", "user_id"})
+    @JsonPropertyOrder({"id", "amount", "origin", "date", "category", "user_id"})
     public record IncomeEntityResponseDTO(
             Long id,
             double amount,
             String origin,
-            Date date,
+            String date,
+            String category,
             Long user_id
     ) {
     }

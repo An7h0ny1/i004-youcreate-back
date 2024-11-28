@@ -8,6 +8,7 @@ import com.igrowker.miniproject.Income.Exception.InvalidIncomeFieldException;
 import com.igrowker.miniproject.Income.Model.Income;
 import com.igrowker.miniproject.Income.Repository.IncomeRepository;
 import com.igrowker.miniproject.User.Exception.UserNotFoundException;
+import com.igrowker.miniproject.User.Model.User;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +53,7 @@ public class IncomeServiceTest {
         income.setId(1L);
         income.setAmount(100.0);
         income.setOrigin("Salary");
-        income.setDate(new Date());
+        income.setDate("2024-05-06");
         income.setUser (user);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -84,7 +85,7 @@ public class IncomeServiceTest {
         IncomeCreateRequestDTO requestDTO = new IncomeCreateRequestDTO();
         requestDTO.setAmount(100.0);
         requestDTO.setOrigin("Salary");
-        requestDTO.setDate(new Date());
+        requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
         UserEntity user = new UserEntity();
@@ -105,7 +106,7 @@ public class IncomeServiceTest {
         IncomeCreateRequestDTO requestDTO = new IncomeCreateRequestDTO();
         requestDTO.setAmount(100.0);
         requestDTO.setOrigin("Salary");
-        requestDTO.setDate(new Date());
+        requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
         when(userRepository.findById(requestDTO.getUser_id())).thenReturn(Optional.empty());
@@ -122,7 +123,7 @@ public class IncomeServiceTest {
         IncomeCreateRequestDTO requestDTO = new IncomeCreateRequestDTO();
         requestDTO.setAmount(-100.0); // Monto inválido
         requestDTO.setOrigin("Salary");
-        requestDTO.setDate(new Date());
+        requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
         Exception exception = assertThrows(InvalidIncomeFieldException.class, () -> {
@@ -136,6 +137,10 @@ public class IncomeServiceTest {
     public void testDeleteIncome_Success() {
         Long incomeId = 1L;
 
+        Income income = new Income(); // Asegúrate de que esta clase existe y tiene el constructor adecuado
+        income.setId(incomeId); // Asigna un ID al ingreso simulado
+
+        when(incomeRepository.findById(incomeId)).thenReturn(Optional.of(income));
         when(incomeRepository.existsById(incomeId)).thenReturn(true);
 
         incomeService.deleteIncome(incomeId);
@@ -164,14 +169,15 @@ public class IncomeServiceTest {
         existingIncome.setId(incomeId);
         existingIncome.setAmount(100.0);
         existingIncome.setOrigin("Salary");
-        existingIncome.setDate(new Date());
+        existingIncome.setDate("2024-05-06");
+        existingIncome.setUser (new UserEntity());
 
         when(incomeRepository.findById(incomeId)).thenReturn(Optional.of(existingIncome));
 
         IncomeUpdateRequestDTO updateRequest = new IncomeUpdateRequestDTO();
         updateRequest.setAmount(150.0);
         updateRequest.setOrigin("Bonus");
-        updateRequest.setDate(new Date());
+        updateRequest.setDate("2024-05-06");
 
         when(incomeRepository.save(any(Income.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -191,9 +197,10 @@ public class IncomeServiceTest {
         when(incomeRepository.findById(incomeId)).thenReturn(Optional.empty());
 
         IncomeUpdateRequestDTO updateRequest = new IncomeUpdateRequestDTO();
+        updateRequest.setId(incomeId);
         updateRequest.setAmount(150.0);
         updateRequest.setOrigin("Bonus");
-        updateRequest.setDate(new Date());
+        updateRequest.setDate("2024-05-06");
 
         Exception exception = assertThrows(IncomeNotFoundException.class, () -> {
             incomeService.updateIncome(incomeId, updateRequest);

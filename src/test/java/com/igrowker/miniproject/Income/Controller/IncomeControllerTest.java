@@ -17,7 +17,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
@@ -32,14 +34,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(IncomeController.class)
+@WithMockUser
 public class IncomeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private IncomeService incomeService;
 
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Mock
@@ -55,7 +59,7 @@ public class IncomeControllerTest {
 
     @Test
     public void testGetIncomes() throws Exception {
-        List<IncomeEntityResponseDTO> incomes = Collections.singletonList(new IncomeEntityResponseDTO(1L, 100.0, "Salary", new Date(), 1L));
+        List<IncomeEntityResponseDTO> incomes = Collections.singletonList(new IncomeEntityResponseDTO(1L, 100.0, "Salary", "2024-05-06", "campaña",1L));
 
         when(incomeService.getIncomes(1L)).thenReturn(incomes);
 
@@ -71,10 +75,10 @@ public class IncomeControllerTest {
         IncomeCreateRequestDTO requestDTO = new IncomeCreateRequestDTO();
         requestDTO.setAmount(100.0);
         requestDTO.setOrigin("Salary");
-        requestDTO.setDate(new Date());
+        requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
-        IncomeEntityResponseDTO responseDTO = new IncomeEntityResponseDTO(1L, 100.0, "Salary", new Date(), 1L);
+        IncomeEntityResponseDTO responseDTO = new IncomeEntityResponseDTO(1L, 100.0, "Salary", "2024-05-06", "campaña", 1L);
 
         when(incomeService.createIncome(any(IncomeCreateRequestDTO.class))).thenReturn(responseDTO);
 
@@ -102,10 +106,10 @@ public class IncomeControllerTest {
         IncomeCreateRequestDTO requestDTO = new IncomeCreateRequestDTO();
         requestDTO.setAmount(100.0);
         requestDTO.setOrigin("Salary");
-        requestDTO.setDate(new Date());
+        requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
-        IncomeEntityResponseDTO responseDTO = new IncomeEntityResponseDTO(1L, 1000,"Salary", requestDTO.getDate(), 1L);
+        IncomeEntityResponseDTO responseDTO = new IncomeEntityResponseDTO(1L, 1000,"Salary", requestDTO.getDate(), "campaña",1L);
 
         when(incomeService.createIncome(any(IncomeCreateRequestDTO.class))).thenReturn(responseDTO);
 
@@ -113,7 +117,7 @@ public class IncomeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":1L,\"amount\":100.0,\"origin\":\"Salary\",\"date\":\"" + requestDTO.getDate() + "\",\"user_id\":1}"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.date").value("date"))
+                .andExpect(jsonPath("$.date").value("2024-05-06"))
                 .andExpect(jsonPath("$.origin").value("Salary"))
                 .andExpect(jsonPath("$.amount").value(100.0))
                 .andExpect(jsonPath("$.user_id").value(1L));
@@ -126,7 +130,7 @@ public class IncomeControllerTest {
         IncomeCreateRequestDTO requestDTO = new IncomeCreateRequestDTO();
         requestDTO.setAmount(100.0);
         requestDTO.setOrigin("Salary");
-        requestDTO.setDate(new Date());
+        requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
         // Simular que el servicio lanza una excepción cuando el usuario no se encuentra
@@ -146,7 +150,7 @@ public class IncomeControllerTest {
         IncomeCreateRequestDTO requestDTO = new IncomeCreateRequestDTO();
         requestDTO.setAmount(-100.0); // Monto inválido
         requestDTO.setOrigin("Salary");
-        requestDTO.setDate(new Date());
+        requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
         // Simular que el servicio lanza una excepción cuando el monto es inválido
@@ -201,7 +205,7 @@ public class IncomeControllerTest {
         existingIncome.setId(incomeId);
         existingIncome.setAmount(100.0);
         existingIncome.setOrigin("Salary");
-        existingIncome.setDate(new Date());
+        existingIncome.setDate("2024-05-06");
 
         // Simular que el ingreso existe
         when(incomeRepository.findById(incomeId)).thenReturn(Optional.of(existingIncome));
@@ -209,10 +213,10 @@ public class IncomeControllerTest {
         IncomeUpdateRequestDTO updateRequest = new IncomeUpdateRequestDTO();
         updateRequest.setAmount(150.0);
         updateRequest.setOrigin("Bonus");
-        updateRequest.setDate(new Date());
+        updateRequest.setDate("2024-05-06");
 
         // Simular que el servicio devuelve el ingreso actualizado
-        IncomeEntityResponseDTO updatedIncomeResponse = new IncomeEntityResponseDTO(1L, 150.0, "Bonus", new Date(),1L);
+        IncomeEntityResponseDTO updatedIncomeResponse = new IncomeEntityResponseDTO(1L, 150.0, "Bonus", "2024-05-06", "campaña",1L);
 
         when(incomeService.updateIncome(eq(incomeId), any(IncomeUpdateRequestDTO.class)))
                 .thenReturn(updatedIncomeResponse);
@@ -240,7 +244,7 @@ public class IncomeControllerTest {
         IncomeUpdateRequestDTO updateRequest = new IncomeUpdateRequestDTO();
         updateRequest.setAmount(150.0);
         updateRequest.setOrigin("Bonus");
-        updateRequest.setDate(new Date());
+        updateRequest.setDate("2024-05-06");
 
         // Realizar la petición PUT y verificar que se devuelve un error 404
         mockMvc.perform(put("/incomes/{id}", incomeId)
