@@ -1,57 +1,58 @@
 package com.igrowker.miniproject.TaxObligation.Service;
-
-import com.igrowker.miniproject.TaxObligation.Dto.TaxDTO;
+import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxNotificationEntity;
+import com.igrowker.miniproject.TaxObligation.Repository.TaxNotificationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class TaxService {
 
-    /*
-    private static final Map<String, Double> TAX_RATES = Map.of(
-            "Bolivia", 14.9,
-            "Argentina", 27.0,
-            "Dominican Republic", 18.0,
-            "Colombia", 19.0,
-            "Costa Rica", 13.0,
-            "Spain", 21.0
+    private final TaxNotificationService taxNotificationService;
+    private final TaxNotificationEmailService taxNotificationEmailService;
+    private final TaxNotificationRepository taxNotificationRepository;
+
+    // Mapa estático de Fecha Limite de pagos
+    protected static final Map<String, LocalDate> TAX_DEADLINES = Map.of(
+            "Bolivia", LocalDate.of(2024, 11, 28),
+            "Argentina", LocalDate.of(2024, 11, 28),
+            "Colombia", LocalDate.of(2024, 11, 28),
+            "Dominican Republic", LocalDate.of(2024, 11, 28),
+            "Costa Rica", LocalDate.of(2024, 11, 28),
+            "Spain", LocalDate.of(2024, 11, 28)
     );
 
-    public Double getTaxRateForCountry(String country) {
-        return TAX_RATES.get(country);
+    @Autowired
+    public TaxService(TaxNotificationService taxNotificationService, TaxNotificationEmailService taxNotificationEmailService, TaxNotificationRepository taxNotificationRepository) {
+        this.taxNotificationService = taxNotificationService;
+        this.taxNotificationEmailService = taxNotificationEmailService;
+        this.taxNotificationRepository = taxNotificationRepository;
     }
 
-     */
+    // Tarea programada para enviar notificaciones de próximos plazos
+    //@Scheduled(cron = "0 0 9 * * ?") // Funciona todos los días a las 9 a.m.
+    public void checkAndSendNotifications() {
+        List<TaxNotificationEntity> upcomingNotifications =
+                taxNotificationService.findUpcomingNotifications();
 
-    // Constantes internas para países.
-    public static final String BOLIVIA = "Bolivia";
-    public static final String ARGENTINA = "Argentina";
-    public static final String DOMINICAN_REPUBLIC = "Dominican Republic";
-    public static final String COLOMBIA = "Colombia";
-    public static final String COSTA_RICA = "Costa Rica";
-    public static final String SPAIN = "Spain";
+        for (TaxNotificationEntity notification : upcomingNotifications) {
+            String email = notification.getUser().getEmail();
+            String country = notification.getCountry();
+            LocalDate deadline = notification.getTaxDeadline();
 
-    // Tasas IVA asigandas a constantes
-    private static final Map<String, Double> TAX_RATES = Map.of(
-            BOLIVIA, 14.9,
-            ARGENTINA, 27.0,
-            DOMINICAN_REPUBLIC, 18.0,
-            COLOMBIA, 19.0,
-            COSTA_RICA, 13.0,
-            SPAIN, 21.0
-    );
+            taxNotificationEmailService.sendTaxDeadlineNotification(email, country, deadline);
 
-    // Método para obtener todas los IVA como DTO
-    public List<TaxDTO> getAllTaxRates() {
-        return TAX_RATES.entrySet().stream()
-                .map(entry -> new TaxDTO(entry.getKey(), entry.getValue()))
-                .toList();
+            // Marcar como notificado y guardar
+            notification.setNotified(true);
+            taxNotificationService.saveNotification(notification);
+        }
     }
 
-    // Método para obtener el IVA por país
-    public Double getTaxRateForCountry(String country) {
-        return TAX_RATES.get(country);
+    // Obtener notificaciones para un usuario específico
+    public List<TaxNotificationEntity> getNotificationsForUser(Long userId) {
+        return taxNotificationService.getNotificationsForUser(userId);
     }
+
 }

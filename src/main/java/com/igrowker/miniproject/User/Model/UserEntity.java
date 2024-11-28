@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.igrowker.miniproject.Collaborator.Model.Collaborator;
 
 import com.igrowker.miniproject.Income.Model.Income;
+import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxNotificationEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -53,6 +54,9 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Collaborator> collaborators;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<TaxNotificationEntity> taxNotifications;
 
     @Column(name = "is_enabled")
     private boolean isEnabled;
