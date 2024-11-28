@@ -4,7 +4,9 @@ import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
 import com.igrowker.miniproject.User.Dto.UserUpdateRequestDTO;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 import com.igrowker.miniproject.User.Exception.UserNotFoundException;
+import com.igrowker.miniproject.User.Model.RegisterVerification2FA;
 import com.igrowker.miniproject.User.Model.UserEntity;
+import com.igrowker.miniproject.User.Repository.RegisterVerification2FARepository;
 import com.igrowker.miniproject.User.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,12 +16,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RegisterVerification2FARepository registerVerification2FARepository;
 
     private final TaxService taxService;
 
@@ -27,8 +31,9 @@ public class UserService {
     private String uploadPath;
 
 
-    public UserService(UserRepository userRepository, TaxService taxService) {
+    public UserService(UserRepository userRepository, RegisterVerification2FARepository registerVerification2FARepository, TaxService taxService) {
         this.userRepository = userRepository;
+        this.registerVerification2FARepository = registerVerification2FARepository;
         this.taxService = taxService;
     }
 
@@ -103,10 +108,12 @@ public class UserService {
             throw new InvalidUserIdException("El id del usuario debe ser mayor a 0");
         }
         UserEntity user = userRepository.findById(id).orElse(null);
+        RegisterVerification2FA fa = registerVerification2FARepository.findByEmail(user != null ? user.getEmail() : "null").orElseThrow(() -> new UserNotFoundException("No se encontro el registro de 2FA para este usuario"));
         if (user == null) {
             throw new UserNotFoundException("Usuario con id " + id + " no encontrado");
         }
         userRepository.delete(user);
+        registerVerification2FARepository.delete(fa);
     }
 
     public List<UserEntity> getAllUsers() {
