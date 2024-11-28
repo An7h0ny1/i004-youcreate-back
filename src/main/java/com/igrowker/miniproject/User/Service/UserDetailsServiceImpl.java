@@ -11,6 +11,7 @@ import com.igrowker.miniproject.User.Repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -243,6 +244,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.debug("JWT token generated successfully.");
 
         return new AuthResponseRegisterDto(username, "Usuario creado exitosamente", accessToken, true);
+    }
+
+    /*@Autowired
+    public UserDetailsServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+    }*/
+
+    public UserEntity getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
 }

@@ -59,7 +59,7 @@ public class IncomeControllerTest {
 
     @Test
     public void testGetIncomes() throws Exception {
-        List<IncomeEntityResponseDTO> incomes = Collections.singletonList(new IncomeEntityResponseDTO(1L, 100.0, "Salary", "2024-05-06", 1L));
+        List<IncomeEntityResponseDTO> incomes = Collections.singletonList(new IncomeEntityResponseDTO(1L, 100.0, "Salary", "2024-05-06", "campaña",1L));
 
         when(incomeService.getIncomes(1L)).thenReturn(incomes);
 
@@ -78,7 +78,7 @@ public class IncomeControllerTest {
         requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
-        IncomeEntityResponseDTO responseDTO = new IncomeEntityResponseDTO(1L, 100.0, "Salary", "2024-05-06", 1L);
+        IncomeEntityResponseDTO responseDTO = new IncomeEntityResponseDTO(1L, 100.0, "Salary", "2024-05-06", "campaña", 1L);
 
         when(incomeService.createIncome(any(IncomeCreateRequestDTO.class))).thenReturn(responseDTO);
 
@@ -109,7 +109,7 @@ public class IncomeControllerTest {
         requestDTO.setDate("2024-05-06");
         requestDTO.setUser_id(1L);
 
-        IncomeEntityResponseDTO responseDTO = new IncomeEntityResponseDTO(1L, 1000,"Salary", requestDTO.getDate(), 1L);
+        IncomeEntityResponseDTO responseDTO = new IncomeEntityResponseDTO(1L, 1000,"Salary", requestDTO.getDate(), "campaña",1L);
 
         when(incomeService.createIncome(any(IncomeCreateRequestDTO.class))).thenReturn(responseDTO);
 
@@ -216,7 +216,7 @@ public class IncomeControllerTest {
         updateRequest.setDate("2024-05-06");
 
         // Simular que el servicio devuelve el ingreso actualizado
-        IncomeEntityResponseDTO updatedIncomeResponse = new IncomeEntityResponseDTO(1L, 150.0, "Bonus", "2024-05-06",1L);
+        IncomeEntityResponseDTO updatedIncomeResponse = new IncomeEntityResponseDTO(1L, 150.0, "Bonus", "2024-05-06", "campaña",1L);
 
         when(incomeService.updateIncome(eq(incomeId), any(IncomeUpdateRequestDTO.class)))
                 .thenReturn(updatedIncomeResponse);

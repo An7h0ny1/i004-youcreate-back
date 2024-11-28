@@ -1,12 +1,16 @@
 package com.igrowker.miniproject.User.Controller;
 
 import com.igrowker.miniproject.Config.TokenBlacklist;
+import com.igrowker.miniproject.TaxObligation.Service.TaxNotificationService;
+import com.igrowker.miniproject.TaxObligation.Service.TaxService;
 import com.igrowker.miniproject.User.Dto.AuthCreateUserRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthLoginRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseRegisterDto;
+import com.igrowker.miniproject.User.Model.UserEntity;
 import com.igrowker.miniproject.User.Service.RegisterVerification2FAService;
 import com.igrowker.miniproject.User.Service.UserDetailsServiceImpl;
+import com.igrowker.miniproject.User.Service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -38,6 +42,7 @@ public class AuthController {
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final RegisterVerification2FAService registerVerification2FAService;
+    private final TaxNotificationService taxNotificationService;
 
     @PostMapping("/login")
     @Tag(name = "Authentication", description = "API for user authentication.")
@@ -89,6 +94,11 @@ public class AuthController {
     )
     public ResponseEntity<?> login(@RequestBody @Valid AuthLoginRequestDto authDto) {
         AuthResponseDto response = this.userDetailsServiceImpl.loginUser(authDto);
+        // Obtener los datos del usuario autenticado
+        UserEntity user = userDetailsServiceImpl.getUserByEmail(authDto.getEmail());
+
+        // Activar la lógica de notificación de la fecha límite de impuestos
+        taxNotificationService.createOrUpdateTaxNotification(user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -108,7 +118,7 @@ public class AuthController {
     )
     public ResponseEntity<?> register(@RequestBody @Valid AuthCreateUserRequestDto authCreateUserDto) throws Exception {
             AuthResponseRegisterDto response = this.userDetailsServiceImpl.createUser(authCreateUserDto);
-            registerVerification2FAService.sendEmailForVerification2FA(authCreateUserDto.getEmail());    
+            registerVerification2FAService.sendEmailForVerification2FA(authCreateUserDto.getEmail());
             return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
