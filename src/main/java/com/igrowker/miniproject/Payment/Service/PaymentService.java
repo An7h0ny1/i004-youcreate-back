@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -117,23 +119,12 @@ public class PaymentService implements IPaymentService {
 
             Payment paymentRegister = paymentOPT.get();
 
-            if (payment.getService() != null)
-                paymentRegister.setService(payment.getService());
-
-            if (payment.getAmount() != null)
-                paymentRegister.setAmount(payment.getAmount());
-
-            if (payment.getStatus() != null)
-                paymentRegister.setStatus(payment.getStatus());
-
-            if (payment.getCategory() != null)
-                paymentRegister.setCategory(payment.getCategory());
-
-            if (payment.getDate() != null)
-                paymentRegister.setDate(payment.getDate());
-
-            if (payment.getCollaborator_id() != null)
-                paymentRegister.setCollaborator_id(payment.getCollaborator_id());
+            updateField(payment.getService(), paymentRegister::setService);
+            updateField(payment.getAmount(), paymentRegister::setAmount);
+            updateField(payment.getStatus(), paymentRegister::setStatus);
+            updateField(payment.getCategory(), paymentRegister::setCategory);
+            updateField(payment.getDate(), paymentRegister::setDate);
+            updateField(payment.getCollaborator_id(), paymentRegister::setCollaborator_id);
 
             paymentRepository.save(paymentRegister);
             return;
@@ -161,5 +152,14 @@ public class PaymentService implements IPaymentService {
             throw new IllegalArgumentException("El mes debe estar entre 1  y 12");
         }
     }
+
+    private <T> void updateField(T value, Consumer<T> function){
+        
+        if (value != null) {
+            function.accept(value);
+        }
+    }
+
+   
 
 }
