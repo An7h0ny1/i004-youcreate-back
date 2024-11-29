@@ -94,11 +94,11 @@ public class AuthController {
     )
     public ResponseEntity<?> login(@RequestBody @Valid AuthLoginRequestDto authDto) {
         AuthResponseDto response = this.userDetailsServiceImpl.loginUser(authDto);
-        // Obtener los datos del usuario autenticado
-        UserEntity user = userDetailsServiceImpl.getUserByEmail(authDto.getEmail());
-
-        // Activar la lógica de notificación de la fecha límite de impuestos
-        taxNotificationService.createOrUpdateTaxNotification(user);
+//        // Obtener los datos del usuario autenticado
+//        UserEntity user = userDetailsServiceImpl.getUserByEmail(authDto.getEmail());
+//
+//        // Activar la lógica de notificación de la fecha límite de impuestos
+//        taxNotificationService.createOrUpdateTaxNotification(user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
