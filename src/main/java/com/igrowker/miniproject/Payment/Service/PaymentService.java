@@ -1,12 +1,19 @@
 package com.igrowker.miniproject.Payment.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
 
 import com.igrowker.miniproject.Collaborator.DTO.CollaboratorEntityResponseDTO;
@@ -19,6 +26,7 @@ import com.igrowker.miniproject.Payment.Repository.PaymentRepository;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 
 @Service
+@EnableScheduling
 public class PaymentService implements IPaymentService {
 
     @Autowired
@@ -78,7 +86,7 @@ public class PaymentService implements IPaymentService {
         
         CollaboratorEntityResponseDTO collaborator = collaboratorService.getCollaborator(paymentR.getCollaborator_id());
         Payment payment = new Payment();
-        Instant date_now = Instant.now();
+        LocalDateTime date_now = LocalDateTime.now();
 
         payment.setAmount(collaborator.amount());
         payment.setCollaborator_id(collaborator.id());
@@ -158,6 +166,23 @@ public class PaymentService implements IPaymentService {
         if (value != null) {
             function.accept(value);
         }
+    }
+
+    @Override
+    public List<Payment> getPaymentsForReminder(int days) {
+        List<Payment> payments = paymentRepository.findByStatus(PaymentStatus.PENDING);
+        return payments.stream().filter(new Predicate<Payment>() {
+
+            @Override
+            public boolean test(Payment payment) {
+
+                LocalDate reminderDate = payment.getExpired_date().toLocalDate().minusDays(days);
+                LocalDate today = LocalDate.now();
+
+               return reminderDate.isEqual(today);
+            }
+            
+        }).toList();
     }
 
    

@@ -3,6 +3,7 @@ package com.igrowker.miniproject.Payment.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.igrowker.miniproject.Payment.DTO.PaymentDTO;
+
 import com.igrowker.miniproject.Payment.Model.Payment;
 import com.igrowker.miniproject.Payment.Model.PaymentStatus;
 import com.igrowker.miniproject.Payment.Service.IPaymentService;
@@ -36,6 +37,7 @@ public class PaymentController {
 
     @Autowired
     private IPaymentService paymentService;
+
     
     @GetMapping("")
     @Tag(name = "Payment", description = "API for get payments")
@@ -155,8 +157,11 @@ public class PaymentController {
         paymentService.deletePaymentById(id);
         return ResponseEntity.ok("Eliminacion correcta!");
     }
-    
-
+     
+    @GetMapping("/Expiring")
+    public ResponseEntity<?> getPaymentsAboutToExpire(@RequestParam String param) {
+        return ResponseEntity.ok(paymentService.getPaymentsForReminder(2));
+    }
     
     
     

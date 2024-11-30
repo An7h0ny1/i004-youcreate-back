@@ -3,6 +3,7 @@ package com.igrowker.miniproject.Payment;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -49,8 +50,8 @@ public class PaymentServiceTest {
         payment.setService("Creacion de UX");
         payment.setStatus(PaymentStatus.PAID);
         payment.setCategory(PaymentMethod.BANK_TRANSFER);
-        payment.setDate(Instant.now());
-        payment.setExpired_date(Instant.now().plus(30, ChronoUnit.DAYS));
+        payment.setDate(LocalDateTime.now());
+        payment.setExpired_date(LocalDateTime.now().plus(30, ChronoUnit.DAYS));
         
         MockitoAnnotations.openMocks(this);
     }
