@@ -49,4 +49,11 @@ public class PaymentException {
             .body(new Api_Response<>(null, e.getMessage(), 400));
 
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Api_Response<?>> handleGenericMethodIllegalStateException(IllegalStateException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new Api_Response<>(null, e.getMessage(), 400));
+
+    }
 }

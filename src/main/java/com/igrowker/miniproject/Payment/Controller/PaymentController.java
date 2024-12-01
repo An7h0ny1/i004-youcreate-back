@@ -144,6 +144,20 @@ public class PaymentController {
         return ResponseEntity.ok(payment);
     }
 
+    @PutMapping("pay/{id}")
+    @Tag(name = "Payment", description = "API for get payments")
+    @Operation(summary = "pay a debt", description = "You can pay a debt")
+    @ApiResponses({
+        @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
+        @ApiResponse(responseCode = "400", description = "bad request, el pago es invalido"),
+        @ApiResponse(responseCode = "200", description = "ok! Se edito el pago correctamente"),
+        @ApiResponse(responseCode = "404", description = "pago no encontrado"),
+    })
+    public ResponseEntity<?> pay(@PathVariable Long id) throws Exception{
+        Payment payment = paymentService.pay(id);
+        return ResponseEntity.ok(payment);
+    }
+
     @DeleteMapping("{id}")
     @Tag(name = "Payment", description = "API for get payments")
     @Operation(summary = "Delete a payment", description = "You can delete a payment")
@@ -159,9 +173,18 @@ public class PaymentController {
     }
      
     @GetMapping("/Expiring")
-    public ResponseEntity<?> getPaymentsAboutToExpire(@RequestParam String param) {
-        return ResponseEntity.ok(paymentService.getPaymentsForReminder(2));
+    @Tag(name = "Payment", description = "API for get payments")
+    @Operation(summary = "get payments for expiring", description = "You can get payments for expiring")
+    @ApiResponses({
+        @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
+        @ApiResponse(responseCode = "200", description = "ok! Se elimino el pago correctamente"),
+        @ApiResponse(responseCode = "404", description = "pagos no encontrado"),
+    })
+    public ResponseEntity<?> getPaymentsAboutToExpire() {
+        return ResponseEntity.ok(paymentService.getPaymentsForReminder(0));
     }
+
+
     
     
     

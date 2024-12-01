@@ -1,12 +1,8 @@
 package com.igrowker.miniproject.Payment.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -14,6 +10,7 @@ import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.igrowker.miniproject.Collaborator.DTO.CollaboratorEntityResponseDTO;
@@ -25,12 +22,17 @@ import com.igrowker.miniproject.Payment.Model.PaymentStatus;
 import com.igrowker.miniproject.Payment.Repository.PaymentRepository;
 import com.igrowker.miniproject.User.Exception.InvalidUserIdException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 @EnableScheduling
 public class PaymentService implements IPaymentService {
 
     @Autowired
     PaymentRepository paymentRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     @Autowired
     private CollaboratorService collaboratorService;
@@ -43,12 +45,11 @@ public class PaymentService implements IPaymentService {
     @Override
     public Payment getPaymentById(Long id) throws Exception {
         verifyId(id);
-        Optional<Payment> payment = paymentRepository.findById(id);
+        Payment payment = paymentRepository
+                .findById(id)
+                .orElseThrow(() -> new PaymentNotFoundException("No se encontro el pago de id:" + id));
 
-        if (payment.isPresent()) {
-            return payment.get();
-        }
-        throw new PaymentNotFoundException("No se encontro el pago de id:" + id);
+        return payment;
     }
 
     @Override
@@ -80,43 +81,52 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public void createPayment(PaymentDTO paymentR) throws Exception {
-        if (paymentR == null) 
-            throw new NullPointerException("El pago no puede ser null");
-        
-        CollaboratorEntityResponseDTO collaborator = collaboratorService.getCollaborator(paymentR.getCollaborator_id());
-        Payment payment = new Payment();
-        LocalDateTime date_now = LocalDateTime.now();
+    public List<Payment> getPaymentsForReminder(int days) {
+        List<Payment> payments = paymentRepository.findByStatus(PaymentStatus.PENDING);
+        return payments.stream().filter(new Predicate<Payment>() {
 
-        payment.setAmount(collaborator.amount());
-        payment.setCollaborator_id(collaborator.id());
-        payment.setService(collaborator.service());
-        payment.setDate(date_now);
-        payment.setStatus(PaymentStatus.PENDING);
-        payment.setCategory(paymentR.getCategory());
-        payment.setExpired_date(date_now.plus(30, ChronoUnit.DAYS));
+            @Override
+            public boolean test(Payment payment) {
+
+                if (payment.getStatus().equals(PaymentStatus.EXPIRED))
+                    return false;
+
+                LocalDate reminderDate = payment.getExpired_date().toLocalDate().minusDays(days);
+                LocalDate today = LocalDate.now();
+
+                return reminderDate.isEqual(today);
+            }
+
+        }).toList();
+    }
+
+    @Override
+    public void createPayment(PaymentDTO paymentR) throws Exception {
+        if (paymentR == null)
+            throw new NullPointerException("El pago no puede ser null");
+
+        CollaboratorEntityResponseDTO collaborator = collaboratorService.getCollaborator(paymentR.getCollaborator_id());
+
+        Payment payment = PaymentService.paymentFromDTO(paymentR, collaborator);
         paymentRepository.save(payment);
     }
 
     @Override
     public void editPayment(Long id, Payment payment) throws Exception {
-        Optional<Payment> paymentOPT = paymentRepository.findById(id);
+        Payment paymentRegister = paymentRepository
+                .findById(id)
+                .orElseThrow(() -> new PaymentNotFoundException("No se ha encontrado a ese pago en el sistema"));
 
-        if (paymentOPT.isPresent()) {
+        paymentRegister.setAmount(payment.getAmount());
+        paymentRegister.setCategory(payment.getCategory());
+        paymentRegister.setService(payment.getService());
+        paymentRegister.setStatus(payment.getStatus());
+        paymentRegister.setDate(payment.getDate());
+        paymentRegister.setCollaborator_id(payment.getCollaborator_id());
 
-            Payment paymentRegister = paymentOPT.get();
+        paymentRepository.save(paymentRegister);
+        return;
 
-            paymentRegister.setAmount(payment.getAmount());
-            paymentRegister.setCategory(payment.getCategory());
-            paymentRegister.setService(payment.getService());
-            paymentRegister.setStatus(payment.getStatus());
-            paymentRegister.setDate(payment.getDate());
-            paymentRegister.setCollaborator_id(payment.getCollaborator_id());
-
-            paymentRepository.save(paymentRegister);
-            return;
-        }
-        throw new PaymentNotFoundException("No se ha encontrado a ese pago en el sistema");
     }
 
     @Override
@@ -140,51 +150,85 @@ public class PaymentService implements IPaymentService {
         throw new PaymentNotFoundException("No se ha encontrado a ese pago en el sistema");
     }
 
+    
+    @Override
+    public Payment pay(Long id) throws Exception {
+        Payment payment = paymentRepository
+        .findById(id)
+        .orElseThrow(() -> new PaymentNotFoundException("No se ha encontrado el pago de id" + id));
+
+        if (payment.getStatus().equals(PaymentStatus.EXPIRED)) 
+            throw new IllegalStateException("El pago ya esta expirado");
+        
+        if(payment.getStatus().equals(PaymentStatus.PAID))
+            throw new IllegalStateException("El pago ya esta pagado");
+
+        updateField(PaymentStatus.PAID, payment::setStatus);
+        paymentRepository.save(payment);
+        return payment;
+    }
+
     @Override
     public void deletePaymentById(Long id) throws Exception {
         verifyId(id);
         paymentRepository.deleteById(id);
     }
 
-    private void verifyId(Long id){
-        if(id < 0) throw new InvalidUserIdException("El id debe ser mayor o igual a 0");
+    @Scheduled(cron = "0 0 0 * * ?") // Se ejecuta todos los días a las 12:00 AM
+    public void updatePaymentsStatus() {
+
+        List<Payment> payments = paymentRepository.findByStatus(PaymentStatus.PENDING);
+
+        payments.stream().filter(new Predicate<Payment>() {
+
+            @Override
+            public boolean test(Payment p) {
+                return p.getExpired_date().isBefore(LocalDateTime.now());
+            }
+
+        }).toList().forEach((p) -> {
+            p.setStatus(PaymentStatus.EXPIRED);
+            paymentRepository.save(p);
+        });
+        logger.info("Tarea completada: Estados de pagos actualizados.");
     }
-    private void  verifyYear(int year) throws IllegalArgumentException{
+
+    private void verifyId(Long id) {
+        if (id < 0)
+            throw new InvalidUserIdException("El id debe ser mayor o igual a 0");
+    }
+
+    private void verifyYear(int year) throws IllegalArgumentException {
         if (year < 2000 || year > 2100) {
             throw new IllegalArgumentException("El año debe estar entre 2000 y 2100");
         }
     }
 
-    private void verifyMonth(int month){
-        if (month < 1 || month > 12){
+    private void verifyMonth(int month) {
+        if (month < 1 || month > 12) {
             throw new IllegalArgumentException("El mes debe estar entre 1  y 12");
         }
     }
 
-    private <T> void updateField(T value, Consumer<T> function){
-        
+    private <T> void updateField(T value, Consumer<T> function) {
+
         if (value != null) {
             function.accept(value);
         }
     }
 
-    @Override
-    public List<Payment> getPaymentsForReminder(int days) {
-        List<Payment> payments = paymentRepository.findByStatus(PaymentStatus.PENDING);
-        return payments.stream().filter(new Predicate<Payment>() {
+    private static Payment paymentFromDTO(PaymentDTO dto, CollaboratorEntityResponseDTO collaborator) {
 
-            @Override
-            public boolean test(Payment payment) {
-
-                LocalDate reminderDate = payment.getExpired_date().toLocalDate().minusDays(days);
-                LocalDate today = LocalDate.now();
-
-               return reminderDate.isEqual(today);
-            }
-            
-        }).toList();
+        Payment payment = new Payment();
+        payment.setAmount(collaborator.amount());
+        payment.setCollaborator_id(collaborator.id());
+        payment.setService(collaborator.service());
+        payment.setDate(LocalDateTime.now());
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setCategory(dto.getCategory());
+        payment.setExpired_date(LocalDateTime.now().plus(30, ChronoUnit.DAYS));
+        return payment;
     }
 
-   
 
 }

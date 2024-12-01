@@ -21,5 +21,7 @@ public interface IPaymentService {
     void createPayment(PaymentDTO payment) throws Exception;
     void editPayment(Long id, Payment payment) throws Exception;
     void partiallyEditPayment(Long id, Payment payment) throws Exception;
+    Payment pay(Long id) throws Exception;
+    
     void deletePaymentById(Long id) throws Exception;
 }
