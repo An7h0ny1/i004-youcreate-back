@@ -35,7 +35,7 @@ import org.springframework.http.HttpHeaders;
                 ),
                 @Server(
                         description = "Render Server",
-                        url = "https://youcreate.com"
+                        url = "https://youcreate.onrender.com/"
                 )
         }
         /*security = @SecurityRequirement(
