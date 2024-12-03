@@ -1,6 +1,6 @@
 package com.igrowker.miniproject.Payment.Model;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
@@ -37,11 +38,10 @@ public class Payment {
 
     @PastOrPresent
     @Column(name = "date_payment", nullable = false)
-    private Instant date;
+    private LocalDateTime date;
 
-    @Future
     @Column(name = "date_expired", nullable = false)
-    private Instant expired_date;
+    private LocalDateTime expired_date;
 
     @Column(name = "service_name", nullable = false)
     private String service;
