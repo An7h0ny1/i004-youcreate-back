@@ -65,7 +65,7 @@ public class IncomeController {
     @Tag(name = "Income", description = "API for create income.")
     @Operation(summary = "Create Income", description = "Create a new income.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Colaborador creado correctamente"),
+            @ApiResponse(responseCode = "201", description = "Ingreso creado correctamente"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
@@ -105,9 +105,9 @@ public class IncomeController {
                 .body(new Api_Response<>(null, "Ingreso eliminado correctamente", 200));
     }
 
-    @GetMapping("/filterByMonth")
+    @GetMapping("/filterByDate")
     @Tag(name = "Income", description = "API for filter incomes.")
-    @Operation(summary = "Obtener ingresos por mes",
+    @Operation(summary = "Obtener ingresos por fecha",
             description = "Este endpoint permite obtener todos los ingresos de un usuario específico para un mes y año determinados.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de ingresos obtenida correctamente"),
@@ -115,7 +115,21 @@ public class IncomeController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public List<IncomeEntityResponseDTO> filterIncomesByMonth(@RequestParam Long userId, @RequestParam int month, @RequestParam int year) {
-        return incomeService.getIncomesByMonth(userId, month, year);
+    public List<IncomeEntityResponseDTO> filterIncomesByDate(@RequestParam Long userId, @RequestParam int month, @RequestParam int year) {
+        return incomeService.getIncomesByDate(userId, month, year);
+    }
+
+    @GetMapping("/filterByMonth")
+    @Tag(name = "Income", description = "API for filter incomes.")
+    @Operation(summary = "Obtener ingresos por mes",
+            description = "Este endpoint permite obtener todos los ingresos de un usuario específico para un mes determinado.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de ingresos obtenida correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public List<IncomeEntityResponseDTO> filterIncomesByMonth(@RequestParam Long userId, @RequestParam int month) {
+        return incomeService.getIncomesByMonth(userId, month);
     }
 }
