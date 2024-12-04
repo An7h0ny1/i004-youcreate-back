@@ -11,8 +11,8 @@ public class NotificationScheduler {
 
     private final TaxNotificationService taxNotificationService;
 
-    //@Scheduled(cron = "0 0 9 * * ?") // Funciona todos los días a las 9 a.m.
-    @Scheduled(fixedRate = 5000)
+    //@Scheduled(fixedRate = 5000)
+    @Scheduled(cron = "0 0 9 * * ?") // Funciona todos los días a las 9 a.m.
     public void runNotificationCheck() {
         taxNotificationService.notifyUsersAboutUpcomingDeadlines();
     }

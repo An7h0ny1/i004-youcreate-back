@@ -11,14 +11,16 @@ public class TaxDTO {
     private String userName;
     private String country;
     private LocalDate taxDeadline;
-    private boolean isNotified;
+    private LocalDate lastNotifiedDate;
+    private boolean isPaymentConfirmed = false;
 
-    public TaxDTO(Long userId, String userName, String country, LocalDate taxDeadline, boolean isNotified) {
+    public TaxDTO(Long userId, String userName, String country, LocalDate taxDeadline, LocalDate lastNotifiedDate, boolean isPaymentConfirmed) {
         this.userId = userId;
         this.userName = userName;
         this.country = country;
         this.taxDeadline = taxDeadline;
-        this.isNotified = isNotified;
+        this.lastNotifiedDate = lastNotifiedDate;
+        this.isPaymentConfirmed = isPaymentConfirmed;
     }
 
 }

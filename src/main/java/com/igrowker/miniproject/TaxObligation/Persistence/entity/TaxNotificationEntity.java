@@ -31,18 +31,27 @@ public class TaxNotificationEntity {
     @Column(nullable = false)
     private LocalDate taxDeadline; // Plazo de pago de impuestos
 
-    @Column(nullable = false)
-    private boolean isNotified; // Seguimiento si el usuario ha sido notificado
+    @Column(nullable = true)
+    private LocalDate lastNotifiedDate;
 
+    private boolean isPaymentConfirmed = false;
 
-
-    public boolean isNotified() {
-        return isNotified;
+    public boolean isPaymentConfirmed() {
+        return isPaymentConfirmed;
     }
 
-    public void setNotified(boolean notified) { // Follow naming conventions
-        this.isNotified = notified;
+    public void setPaymentConfirmed(boolean paymentConfirmed) {
+        isPaymentConfirmed = paymentConfirmed;
     }
+
+    public LocalDate getLastNotifiedDate() {
+        return lastNotifiedDate;
+    }
+
+    public void setLastNotifiedDate(LocalDate lastNotifiedDate) {
+        this.lastNotifiedDate = lastNotifiedDate;
+    }
+
 
     public TaxNotificationEntity() {
     }
