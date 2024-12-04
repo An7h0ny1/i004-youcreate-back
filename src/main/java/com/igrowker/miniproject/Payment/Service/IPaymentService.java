@@ -16,9 +16,12 @@ public interface IPaymentService {
     List<Payment> getPaymentsByYear(int year) throws Exception;
     List<Payment> getPaymentsByMonth(int month) throws Exception;
     List<Payment> getPaymentsByYearAndMonth(int year, int month) throws Exception;
+    List<Payment> getPaymentsForReminder(int days);
 
     void createPayment(PaymentDTO payment) throws Exception;
     void editPayment(Long id, Payment payment) throws Exception;
     void partiallyEditPayment(Long id, Payment payment) throws Exception;
+    Payment pay(Long id) throws Exception;
+    
     void deletePaymentById(Long id) throws Exception;
 }
