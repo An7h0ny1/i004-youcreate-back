@@ -2,10 +2,7 @@ package com.igrowker.miniproject.TaxObligation.Persistence.entity;
 
 import com.igrowker.miniproject.User.Model.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +10,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @Table(name = "tax_notifications")
 public class TaxNotificationEntity {
@@ -25,15 +23,23 @@ public class TaxNotificationEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user; // Relación con UserEntity
 
-    @Column(nullable = false)
-    private String country; // País donde se aplica el impuesto
+    //@Column(nullable = false)
+    //private String country; // País donde se aplica el impuesto
+
+    @ManyToOne
+    @JoinColumn(name = "tax_type_id", nullable = false)
+    private TaxType taxType;
 
     @Column(nullable = false)
-    private LocalDate taxDeadline; // Plazo de pago de impuestos
+    private LocalDate taxDeadline;// Plazo de pago de impuestos
+
+    @Column(nullable = false)
+    private boolean isNotified;
 
     @Column(nullable = true)
     private LocalDate lastNotifiedDate;
 
+    /*
     private boolean isPaymentConfirmed = false;
 
     public boolean isPaymentConfirmed() {
@@ -43,6 +49,11 @@ public class TaxNotificationEntity {
     public void setPaymentConfirmed(boolean paymentConfirmed) {
         isPaymentConfirmed = paymentConfirmed;
     }
+
+     */
+
+    @Column(nullable = false)
+    private boolean paymentConfirmed;
 
     public LocalDate getLastNotifiedDate() {
         return lastNotifiedDate;
@@ -56,10 +67,13 @@ public class TaxNotificationEntity {
     public TaxNotificationEntity() {
     }
 
-    public TaxNotificationEntity(UserEntity user, String country, LocalDate taxDeadline) {
+    // Update constructor to include TaxType
+    public TaxNotificationEntity(UserEntity user, TaxType taxType) {
         this.user = user;
-        this.country = country;
-        this.taxDeadline = taxDeadline;
+        this.taxType = taxType;
+        this.taxDeadline = taxType.getExpirationDate();
+        this.isNotified = false;
+        this.paymentConfirmed = false;
     }
 
 }

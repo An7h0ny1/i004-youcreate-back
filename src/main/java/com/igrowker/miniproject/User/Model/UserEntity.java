@@ -45,12 +45,10 @@ public class UserEntity {
 
     private String role;
 
-    private String profilePhotoPath;
-
-
     private String country;
 
-    private Double taxRate;
+    private String profilePhotoPath;
+
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Collaborator> collaborators;
@@ -75,6 +73,13 @@ public class UserEntity {
 
     public boolean getVerify() {
         return verify;
+    }
+
+    public String getCountry() {
+        return getCountry();
+    }
+
+    public void setCountry(String country) {
     }
 
     /*@ManyToMany(fetch = FetchType.EAGER , targetEntity = Role.class, cascade = CascadeType.PERSIST)

@@ -1,6 +1,7 @@
 package com.igrowker.miniproject.TaxObligation.Repository;
 
 import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxNotificationEntity;
+import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxType;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -20,5 +21,11 @@ public interface TaxNotificationRepository extends JpaRepository<TaxNotification
 
     List<TaxNotificationEntity> findByTaxDeadlineBetween(LocalDate now, LocalDate localDate);
 
-    Optional<TaxNotificationEntity> findByUserAndCountry(UserEntity user, String country);
+
+    List<TaxNotificationEntity> findByIsNotifiedFalseAndTaxDeadlineIn(List<LocalDate> list);
+
+    Optional<TaxNotificationEntity> findByUserAndTaxType(UserEntity user, TaxType taxType);
+
+    List<TaxNotificationEntity> findByTaxTypeAndTaxDeadlineBetween(TaxType taxType, LocalDate startDate, LocalDate endDate);
+
 }

@@ -1,56 +1,74 @@
 package com.igrowker.miniproject.TaxObligation.Service;
 import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxNotificationEntity;
+import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxType;
 import com.igrowker.miniproject.TaxObligation.Repository.TaxNotificationRepository;
+import com.igrowker.miniproject.TaxObligation.Repository.TaxTypeRepository;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static com.igrowker.miniproject.TaxObligation.Service.TaxService.TAX_DEADLINES;
 
 @Service
 public class TaxNotificationService {
 
     private final TaxNotificationRepository taxNotificationRepository;
     private final TaxNotificationEmailService taxNotificationEmailService;
+    private final TaxTypeRepository taxTypeRepository;
 
 
     @Autowired
-    public TaxNotificationService(TaxNotificationRepository taxNotificationRepository, TaxNotificationEmailService taxNotificationEmailService) {
+    public TaxNotificationService(TaxNotificationRepository taxNotificationRepository, TaxNotificationEmailService taxNotificationEmailService, TaxTypeRepository taxTypeRepository) {
         this.taxNotificationRepository = taxNotificationRepository;
         this.taxNotificationEmailService = taxNotificationEmailService;
+        this.taxTypeRepository = taxTypeRepository;
     }
 
+    // Updated method to create or update notifications
     @Transactional
     public void createOrUpdateTaxNotification(UserEntity user) {
-        String country = user.getCountry();
-        LocalDate taxDeadline = getTaxDeadlineForCountry(country);
-
-        // Crear o actualizar la entidad de notificación
-        TaxNotificationEntity taxNotification = taxNotificationRepository.findByUserAndCountry(user, country)
-                .orElse(new TaxNotificationEntity(user, country, taxDeadline));
-        taxNotification.setTaxDeadline(taxDeadline);
-        taxNotificationRepository.save(taxNotification);
-
-        // Saltar notificación si se confirma el pago
-        if (taxNotification.isPaymentConfirmed()) {
-            return;
+        // Fetch all tax types
+        List<TaxType> taxTypes = taxTypeRepository.findAll();
+        if (taxTypes.isEmpty()) {
+            throw new IllegalArgumentException("No tax types found in the system.");
         }
 
-        // Enviar notificación por correo electrónico si está dentro del rango de notificación
-        if (!LocalDate.now().isAfter(taxDeadline) &&
-                !LocalDate.now().isBefore(taxDeadline.minusDays(4))) {
+        for (TaxType taxType : taxTypes) {
+            // Check if a notification already exists for the user and specific tax type
+            TaxNotificationEntity taxNotification = taxNotificationRepository
+                    .findByUserAndTaxType(user, taxType)
+                    .orElse(new TaxNotificationEntity(user, taxType)); // Updated constructor usage
 
-            if (taxNotification.getLastNotifiedDate() == null || !taxNotification.getLastNotifiedDate().equals(LocalDate.now())) {
-                taxNotificationEmailService.sendTaxDeadlineNotification(user.getEmail(), country, taxDeadline);
+            // Update the tax deadline
+            taxNotification.setTaxDeadline(taxType.getExpirationDate());
+            taxNotificationRepository.save(taxNotification);
 
-                // Actualizar la última fecha notificada
-                taxNotification.setLastNotifiedDate(LocalDate.now());
-                taxNotificationRepository.save(taxNotification);
+            // Skip notification if payment is confirmed
+            if (taxNotification.isPaymentConfirmed()) {
+                continue;
+            }
+
+            // Notify if within the range
+            if (!LocalDate.now().isAfter(taxType.getExpirationDate()) &&
+                    !LocalDate.now().isBefore(taxType.getExpirationDate().minusDays(4))) {
+                if (taxNotification.getLastNotifiedDate() == null ||
+                        !taxNotification.getLastNotifiedDate().equals(LocalDate.now())) {
+                    taxNotificationEmailService.sendTaxDeadlineNotification(
+                            user.getEmail(),
+                            taxType.getCountry(), // Use TaxType to get the country
+                            taxType.getExpirationDate()
+                    );
+
+                    taxNotification.setLastNotifiedDate(LocalDate.now());
+                    taxNotificationRepository.save(taxNotification);
+                }
             }
         }
     }
@@ -63,7 +81,13 @@ public class TaxNotificationService {
 
     // Obtener las próximas notificaciones
     public List<TaxNotificationEntity> findUpcomingNotifications() {
-        return taxNotificationRepository.findByIsNotifiedFalseAndTaxDeadlineBefore(LocalDate.now().plusDays(4));
+        // Get tax types with expiration dates in the next 4 days
+        List<TaxType> upcomingTaxTypes = taxTypeRepository.findByExpirationDateBefore(LocalDate.now().plusDays(4));
+
+        // Retrieve notifications for those deadlines
+        return taxNotificationRepository.findByIsNotifiedFalseAndTaxDeadlineIn(
+                upcomingTaxTypes.stream().map(TaxType::getExpirationDate).toList()
+        );
     }
 
     // Guardar notificación
@@ -73,13 +97,19 @@ public class TaxNotificationService {
     }
 
     private LocalDate getTaxDeadlineForCountry(String country) {
-        LocalDate deadline = TAX_DEADLINES.get(country);
-        if (deadline == null) {
-            throw new IllegalArgumentException("No tax deadline found for country: " + country);
+        List<TaxType> taxTypes = taxTypeRepository.findByCountry(country);
+        if (taxTypes.isEmpty()) {
+            throw new IllegalArgumentException("No tax deadlines found for country: " + country);
         }
-        return deadline;
+
+        // Assume one tax type per country or return the earliest deadline
+        return taxTypes.stream()
+                .map(TaxType::getExpirationDate)
+                .min(Comparator.naturalOrder())
+                .orElseThrow(() -> new IllegalStateException("Unexpected error while fetching tax deadlines."));
     }
 
+    /*
     // Método para notificar a los usuarios sobre los próximos plazos
     @Transactional
     public void notifyUsersAboutUpcomingDeadlines() {
@@ -111,6 +141,37 @@ public class TaxNotificationService {
                 System.err.println("Failed to notify user: " + e.getMessage());
             }
         });
+    }
+
+     */
+
+    @Scheduled(cron = "0 0 9 * * ?") // Runs daily at 9 a.m.
+    public void notifyUsersAboutUpcomingDeadlines() {
+        // Fetch all tax types with expiration dates within the next 4 days
+        List<TaxType> upcomingTaxes = taxTypeRepository.findByExpirationDateBefore(LocalDate.now().plusDays(4));
+
+        for (TaxType taxType : upcomingTaxes) {
+            // Find notifications for the specific tax type
+            List<TaxNotificationEntity> notifications = taxNotificationRepository.findByTaxTypeAndTaxDeadlineBetween(
+                    taxType, LocalDate.now(), taxType.getExpirationDate()
+            );
+
+            notifications.forEach(notification -> {
+                if (!notification.isPaymentConfirmed() &&
+                        (notification.getLastNotifiedDate() == null ||
+                                !notification.getLastNotifiedDate().equals(LocalDate.now()))) {
+                    taxNotificationEmailService.sendTaxDeadlineNotification(
+                            notification.getUser().getEmail(),
+                            taxType.getCountry(), // Updated to fetch country from TaxType
+                            taxType.getExpirationDate() // Updated to fetch expiration date from TaxType
+                    );
+
+                    // Update the last notified date and save the notification
+                    notification.setLastNotifiedDate(LocalDate.now());
+                    taxNotificationRepository.save(notification);
+                }
+            });
+        }
     }
 
     @Transactional
