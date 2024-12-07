@@ -65,6 +65,23 @@ public class PaymentController {
         return ResponseEntity.ok(new Api_Response<>(payment, "pago encontrado con exito!", 200));
     }
 
+    @GetMapping("/collaborator/{id}")
+    @Tag(name = "Payment", description = "API for get payments")
+    @Operation(summary = "Get payment by id collaborator", description = "Get payment data by id collaborator.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "404", description = "pago no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
+        @ApiResponse(responseCode = "400", description = "bad request error")
+    })
+    public ResponseEntity<Api_Response<List<Payment>>> getPaymentByIdCollaborator(@PathVariable @Valid Long id) throws Exception{
+        List<Payment> payments = paymentService.getPaymentsByIdCollaborator(id);
+
+        if (payments == null) {
+            ResponseEntity.ok("No hay pagos encontrados");
+        }
+        return ResponseEntity.ok(new Api_Response<>(payments, "pagos encontrados con exito!", 200));
+    }
+
     @GetMapping("/status/{status}")
     @Tag(name = "Payment", description = "API for get payments")
     @Operation(summary = "Get payments status", description = "Get payments data by status.")

@@ -12,6 +12,7 @@ public interface IPaymentService {
     
     List<Payment> getAllPayments();
     Payment getPaymentById(Long id) throws Exception;
+    List<Payment>  getPaymentsByIdCollaborator(Long id_collaborator) throws Exception;
     List<Payment> getPaymentsByStatus(@Valid PaymentStatus Status) throws Exception;
     List<Payment> getPaymentsByYear(int year) throws Exception;
     List<Payment> getPaymentsByMonth(int month) throws Exception;

@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.Payment.Model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.annotation.Nonnull;
@@ -29,7 +30,7 @@ public class Payment {
     private Long id;
 
     @Column(nullable = false, name = "collaborator_id")
-    private Long collaborator_id;
+    private Long collaboratorId;
 
     @DecimalMin(value = "0.1", message = "el monto debe ser mayor o igual a 0")
     @Column(name = "amount")
@@ -38,10 +39,10 @@ public class Payment {
 
     @PastOrPresent
     @Column(name = "date_payment", nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Column(name = "date_expired", nullable = false)
-    private LocalDateTime expired_date;
+    private LocalDate expired_date;
 
     @Column(name = "service_name", nullable = false)
     private String service;
