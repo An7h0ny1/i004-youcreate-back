@@ -53,9 +53,9 @@ public class IncomeService {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuario con id " + id + " no encontrado"));
 
-        List<Income> collaborators = incomeRepository.findByUserId(id);
+        List<Income> incomes = incomeRepository.findByUserId(id);
 
-        return collaborators.stream()
+        return incomes.stream()
                 .map(this::entityToDTO)
                 .collect(Collectors.toList());
     }
@@ -194,7 +194,7 @@ public class IncomeService {
         }
     }
 
-    public List<IncomeEntityResponseDTO> getIncomesByMonth(Long userId, int month, int year) {
+    public List<IncomeEntityResponseDTO> getIncomesByDate(Long userId, int month, int year) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuario con id " + userId + " no encontrado"));
 
@@ -206,6 +206,23 @@ public class IncomeService {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(convertStringToDate(income.getDate()));
                     return calendar.get(Calendar.MONTH) + 1 == month && calendar.get(Calendar.YEAR) == year; // +1 porque los meses en Calendar son 0-indexados
+                })
+                .map(this::entityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<IncomeEntityResponseDTO> getIncomesByMonth(Long userId, int month) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuario con id " + userId + " no encontrado"));
+
+        List<Income> incomes = incomeRepository.findByUserId(userId);
+
+        return incomes.stream()
+                .filter(income -> {
+                    //Date incomeDate = convertStringToDate(income.getDate());
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(convertStringToDate(income.getDate()));
+                    return calendar.get(Calendar.MONTH) + 1 == month; // +1 porque los meses en Calendar son 0-indexados
                 })
                 .map(this::entityToDTO)
                 .collect(Collectors.toList());

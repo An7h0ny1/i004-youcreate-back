@@ -1,6 +1,7 @@
 package com.igrowker.miniproject.Payment.Model;
 
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
@@ -11,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
@@ -28,7 +30,7 @@ public class Payment {
     private Long id;
 
     @Column(nullable = false, name = "collaborator_id")
-    private Long collaborator_id;
+    private Long collaboratorId;
 
     @DecimalMin(value = "0.1", message = "el monto debe ser mayor o igual a 0")
     @Column(name = "amount")
@@ -37,11 +39,10 @@ public class Payment {
 
     @PastOrPresent
     @Column(name = "date_payment", nullable = false)
-    private Instant date;
+    private LocalDate date;
 
-    @Future
     @Column(name = "date_expired", nullable = false)
-    private Instant expired_date;
+    private LocalDate expired_date;
 
     @Column(name = "service_name", nullable = false)
     private String service;
