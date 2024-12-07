@@ -15,7 +15,6 @@ import com.igrowker.miniproject.User.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,9 +47,9 @@ public class CollaboratorService {
                         collaborator.getId(),
                         collaborator.getName(),
                         collaborator.getService(),
+                        collaborator.getDate(),
                         collaborator.getAmount(),
-                        collaborator.getUser().getId()
-                ))
+                        collaborator.getUser().getId()))
                 .orElseThrow(() -> new CollaboratorNotFoundException("Colaborador con id " + id + " no encontrado"));
     }
 
@@ -58,11 +57,13 @@ public class CollaboratorService {
         validateCollaboratorCreateFields(collaboratorCreateRequestDTO);
 
         UserEntity user = userRepository.findById(collaboratorCreateRequestDTO.getUser_id())
-                .orElseThrow(() -> new UserNotFoundException("Usuario con id " + collaboratorCreateRequestDTO.getUser_id() + " no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Usuario con id " + collaboratorCreateRequestDTO.getUser_id() + " no encontrado"));
 
         Collaborator collaborator = Collaborator.builder()
                 .name(collaboratorCreateRequestDTO.getName())
                 .service(collaboratorCreateRequestDTO.getService())
+                .date(collaboratorCreateRequestDTO.getDate())
                 .amount(collaboratorCreateRequestDTO.getAmount())
                 .user(user)
                 .build();
@@ -73,12 +74,13 @@ public class CollaboratorService {
                 collaborator.getId(),
                 collaborator.getName(),
                 collaborator.getService(),
+                collaborator.getDate(),
                 collaborator.getAmount(),
-                collaborator.getUser().getId()
-        );
+                collaborator.getUser().getId());
     }
 
-    public CollaboratorEntityResponseDTO updateCollaborator(Long id, CollaboratorUpdateRequestDTO collaboratorUpdateRequestDTO) {
+    public CollaboratorEntityResponseDTO updateCollaborator(Long id,
+            CollaboratorUpdateRequestDTO collaboratorUpdateRequestDTO) {
         validateCollaboratorId(id);
 
         Collaborator collaborator = collaboratorRepository.findById(id)
@@ -96,9 +98,9 @@ public class CollaboratorService {
                 collaborator.getId(),
                 collaborator.getName(),
                 collaborator.getService(),
+                collaborator.getDate(),
                 collaborator.getAmount(),
-                collaborator.getUser().getId()
-        );
+                collaborator.getUser().getId());
     }
 
     public void deleteCollaborator(Long id) {
@@ -115,9 +117,9 @@ public class CollaboratorService {
                 collaborator.getId(),
                 collaborator.getName(),
                 collaborator.getService(),
+                collaborator.getDate(),
                 collaborator.getAmount(),
-                collaborator.getUser().getId()
-        );
+                collaborator.getUser().getId());
     }
 
     public void validateCollaboratorCreateFields(CollaboratorCreateRequestDTO collaboratorCreateRequestDTO) {
@@ -125,7 +127,9 @@ public class CollaboratorService {
             throw new BadCollaboratorBodyRequestException("El objeto de solicitud del colaborador no puede ser nulo");
         }
 
-        validateCollaboratorFields(collaboratorCreateRequestDTO.getName(), collaboratorCreateRequestDTO.getService(), collaboratorCreateRequestDTO.getAmount());
+        validateCollaboratorFields(collaboratorCreateRequestDTO.getName(),
+                collaboratorCreateRequestDTO.getService(),
+                collaboratorCreateRequestDTO.getDate(), collaboratorCreateRequestDTO.getAmount());
     }
 
     public void validateCollaboratorUpdateFields(CollaboratorUpdateRequestDTO collaboratorUpdateRequestDTO) {
@@ -133,12 +137,18 @@ public class CollaboratorService {
             throw new BadCollaboratorBodyRequestException("El objeto de solicitud del colaborador no puede ser nulo");
         }
 
-        validateCollaboratorFields(collaboratorUpdateRequestDTO.getName(), collaboratorUpdateRequestDTO.getService(), collaboratorUpdateRequestDTO.getAmount());
+        validateCollaboratorFields(collaboratorUpdateRequestDTO.getName(), collaboratorUpdateRequestDTO.getService(),
+                collaboratorUpdateRequestDTO.getDate(),
+                collaboratorUpdateRequestDTO.getAmount());
     }
 
-    private void validateCollaboratorFields(String name, String service, Double amount) {
+    private void validateCollaboratorFields(String name, String service, String date, Double amount) {
         if (amount <= 0) {
             throw new InvalidCollaboratorFieldException("El monto del colaborador debe ser mayor a 0");
+        }
+
+        if (date == null || date.isEmpty()) {
+            throw new InvalidCollaboratorFieldException("La fecha del colaborador no puede estar vacía");
         }
 
         if (name == null || name.isEmpty()) {
