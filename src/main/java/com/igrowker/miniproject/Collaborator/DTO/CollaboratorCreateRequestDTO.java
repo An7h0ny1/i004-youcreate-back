@@ -17,6 +17,8 @@ public class CollaboratorCreateRequestDTO {
     public String name;
     @NotBlank(message = "Service is required")
     public String service;
+    @NotNull(message = "Date is required")
+    public String date;
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")
     public Double amount;

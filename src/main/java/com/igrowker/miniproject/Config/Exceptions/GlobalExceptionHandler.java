@@ -123,18 +123,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<UserProfileResponseDTO> handleUserNotFound(UserNotFoundException ex) {
-        UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, null, null);
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
+    // @ExceptionHandler(UserNotFoundException.class)
+    // public ResponseEntity<UserProfileResponseDTO> handleUserNotFound(UserNotFoundException ex) {
+    //     UserProfileResponseDTO response = new UserProfileResponseDTO(null, null, null, null, null, null);
+    //     return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    // }
 
-    @ExceptionHandler({InvalidCollaboratorIdException.class, CollaboratorNotFoundException.class, BadCollaboratorBodyRequestException.class})
+    @ExceptionHandler({InvalidCollaboratorIdException.class, CollaboratorNotFoundException.class, BadCollaboratorBodyRequestException.class, UserNotFoundException.class})
     public ResponseEntity<Api_Response<Object>> handleCollaboratorExceptions(Exception ex) {
         int statusCode;
         if (ex instanceof InvalidCollaboratorIdException || ex instanceof BadCollaboratorBodyRequestException) {
             statusCode = 400;
-        } else if (ex instanceof CollaboratorNotFoundException) {
+        } else if (ex instanceof CollaboratorNotFoundException || ex instanceof UserNotFoundException) {
             statusCode = 404;
         } else {
             statusCode = 500;
