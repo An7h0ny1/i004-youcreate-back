@@ -18,7 +18,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+<<<<<<< HEAD
 import java.util.HashMap;
+=======
+import java.math.BigDecimal;
+>>>>>>> origin/develop
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +65,20 @@ public class IncomeController {
         IncomeEntityResponseDTO response = incomeService.getIncome(id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Api_Response<>(response, "Ingreso encontrado correctamente", 200));
+    }
+
+    @GetMapping("/user/{userId}/total-amount")
+    @Tag(name = "Income", description = "API for income data.")
+    @Operation(summary = "Get Total Amount", description = "Get total amount of incomes by user id.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Total amount encontrado para el usuario"),
+            @ApiResponse(responseCode = "400", description = "El id del usuario debe ser mayor a 0 o los datos inválidos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<Api_Response<BigDecimal>> getTotalAmount(@PathVariable Long userId) {
+        BigDecimal totalAmount = incomeService.getTotalAmount(userId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Api_Response<>(totalAmount, "Total amount encontrado correctamente", 200));
     }
 
     @PostMapping("/create")

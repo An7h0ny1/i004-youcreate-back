@@ -61,11 +61,13 @@ public class CollaboratorController {
     @Operation(summary = "Create Collaborator", description = "Create a new collaborator.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Colaborador creado satisfactoriamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     public ResponseEntity<Api_Response<CollaboratorEntityResponseDTO>> createCollaborator(@RequestBody @Valid CollaboratorCreateRequestDTO collaboratorCreateRequestDTO) {
         CollaboratorEntityResponseDTO response = collaboratorService.createCollaborator(collaboratorCreateRequestDTO);
+        System.out.println(response);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new Api_Response<>(response, "Colaborador creado satisfactoriamente", 201));
     }

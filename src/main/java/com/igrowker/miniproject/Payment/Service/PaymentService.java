@@ -91,7 +91,7 @@ public class PaymentService implements IPaymentService {
                 if (payment.getStatus().equals(PaymentStatus.EXPIRED))
                     return false;
 
-                LocalDate reminderDate = payment.getExpired_date().toLocalDate().minusDays(days);
+                LocalDate reminderDate = payment.getExpired_date().minusDays(days);
                 LocalDate today = LocalDate.now();
 
                 return reminderDate.isEqual(today);
@@ -122,7 +122,7 @@ public class PaymentService implements IPaymentService {
         paymentRegister.setService(payment.getService());
         paymentRegister.setStatus(payment.getStatus());
         paymentRegister.setDate(payment.getDate());
-        paymentRegister.setCollaborator_id(payment.getCollaborator_id());
+        paymentRegister.setCollaboratorId(payment.getCollaboratorId());
 
         paymentRepository.save(paymentRegister);
         return;
@@ -142,7 +142,7 @@ public class PaymentService implements IPaymentService {
             updateField(payment.getStatus(), paymentRegister::setStatus);
             updateField(payment.getCategory(), paymentRegister::setCategory);
             updateField(payment.getDate(), paymentRegister::setDate);
-            updateField(payment.getCollaborator_id(), paymentRegister::setCollaborator_id);
+            updateField(payment.getCollaboratorId(), paymentRegister::setCollaboratorId);
 
             paymentRepository.save(paymentRegister);
             return;
@@ -183,7 +183,7 @@ public class PaymentService implements IPaymentService {
 
             @Override
             public boolean test(Payment p) {
-                return p.getExpired_date().isBefore(LocalDateTime.now());
+                return p.getExpired_date().isBefore(LocalDate.now());
             }
 
         }).toList().forEach((p) -> {
@@ -221,13 +221,24 @@ public class PaymentService implements IPaymentService {
 
         Payment payment = new Payment();
         payment.setAmount(collaborator.amount());
-        payment.setCollaborator_id(collaborator.id());
+        payment.setCollaboratorId(collaborator.id());
         payment.setService(collaborator.service());
-        payment.setDate(LocalDateTime.now());
+        payment.setDate(LocalDate.now());
         payment.setStatus(PaymentStatus.PENDING);
         payment.setCategory(dto.getCategory());
-        payment.setExpired_date(LocalDateTime.now().plus(30, ChronoUnit.DAYS));
+        payment.setExpired_date(LocalDate.now().plus(30, ChronoUnit.DAYS));
         return payment;
+    }
+
+    @Override
+    public List<Payment> getPaymentsByIdCollaborator(Long id_collaborator) throws Exception {
+
+        List<Payment> payments = paymentRepository.findByCollaboratorId(id_collaborator);
+
+        if (payments.isEmpty())
+            return null;
+
+        return payments;
     }
 
 

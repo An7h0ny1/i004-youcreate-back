@@ -11,7 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -39,7 +38,11 @@ public class Collaborator {
     @NotNull(message = "Amount is required")
     @Column(name = "amount")
     private Double amount;
-
+    
+    @NotNull(message = "Date is required")
+    @Column(name = "date")
+    private String date;
+    
     @NotNull(message = "User is required")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

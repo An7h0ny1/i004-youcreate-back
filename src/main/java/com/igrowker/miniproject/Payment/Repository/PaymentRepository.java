@@ -15,6 +15,7 @@ import java.sql.Date;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByDate(Date date);
     List<Payment> findByStatus(PaymentStatus status);
+    List<Payment> findByCollaboratorId(Long collaboratorId);
 
     @Query("SELECT p FROM Payment p WHERE YEAR(p.date) = :year")
     List<Payment> findByYear(@Param("year") int year);
@@ -25,4 +26,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT p FROM Payment p WHERE MONTH(p.date) = :month AND YEAR(p.date) = :year")
     List<Payment> findByMonthAndYear(@Param("month") int month, @Param("year") int year);
 
+   
 }
