@@ -2,23 +2,33 @@ package com.igrowker.miniproject.TaxObligation.Dto;
 import lombok.*;
 import java.time.LocalDate;
 
-@Data
-@Builder
+@Getter
+@Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class TaxDTO {
+    //private Long taxId;
+    private String taxName;        // e.g., VAT, ISR
+    private double amount;
+    private double percentage;     // Tax percentage
+    private LocalDate deadline;    // Expiration date
+    private String status;         // e.g., PENDING
+    private String action;         // e.g., "pay"
+    private double taxDue;         // Monto del impuesto adeudado por este impuesto en particular (valor calculado)
+    private double amountPaid; // Refleja el monto pagado
 
-    private Long userId;
-    private String userName;
-    private String country;
-    private LocalDate taxDeadline;
-    private boolean isNotified;
+    // getters, and setters
 
-    public TaxDTO(Long userId, String userName, String country, LocalDate taxDeadline, boolean isNotified) {
-        this.userId = userId;
-        this.userName = userName;
-        this.country = country;
-        this.taxDeadline = taxDeadline;
-        this.isNotified = isNotified;
+    // Getters and Setters
+    public double getTaxDue() {
+        return taxDue;
     }
 
+    public void setTaxDue(double taxDue) {
+        this.taxDue = taxDue;
+    }         // e.g., "pagar"
 }
+
+
+
