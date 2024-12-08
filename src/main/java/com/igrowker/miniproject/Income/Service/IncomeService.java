@@ -16,6 +16,7 @@ import com.igrowker.miniproject.User.Repository.UserRepository;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -73,6 +74,17 @@ public class IncomeService {
                         income.getUser().getId()
                 ))
                 .orElseThrow(() -> new IncomeNotFoundException("Ingreso con id " + id + " no encontrado"));
+    }
+
+    public BigDecimal getTotalAmount(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuario con id " + userId + " no encontrado"));
+
+        List<Income> incomes = incomeRepository.findByUserId(userId);
+
+        return incomes.stream()
+                .map(income -> BigDecimal.valueOf(income.getAmount()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public IncomeEntityResponseDTO createIncome(IncomeCreateRequestDTO incomeCreateRequestDTO) {
