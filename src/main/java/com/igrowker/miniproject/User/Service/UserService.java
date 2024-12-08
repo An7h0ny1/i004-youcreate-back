@@ -1,4 +1,6 @@
 package com.igrowker.miniproject.User.Service;
+import com.igrowker.miniproject.TaxObligation.Dto.TaxStatus;
+import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxType;
 import com.igrowker.miniproject.TaxObligation.Service.TaxNotificationService;
 import com.igrowker.miniproject.TaxObligation.Service.TaxService;
 import com.igrowker.miniproject.User.Dto.UserProfileResponseDTO;
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +40,7 @@ public class UserService {
 
     public void saveUser(UserEntity userEntity) {
         userRepository.save(userEntity);
+        //taxNotificationService.associateTaxesForUserBasedOnCountry(userEntity);
     }
 
     public UserProfileResponseDTO getUserProfile(Long id) {
@@ -119,5 +124,4 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
     }
-
 }

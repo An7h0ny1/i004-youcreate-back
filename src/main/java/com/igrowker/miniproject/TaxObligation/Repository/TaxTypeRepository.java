@@ -1,7 +1,12 @@
 package com.igrowker.miniproject.TaxObligation.Repository;
 
+import com.igrowker.miniproject.TaxObligation.Dto.TaxCategory;
+import com.igrowker.miniproject.TaxObligation.Dto.TaxStatus;
 import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxType;
+import com.igrowker.miniproject.User.Model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -12,9 +17,13 @@ import java.util.Optional;
 @Repository
 public interface TaxTypeRepository extends JpaRepository<TaxType, Long> {
 
-    List<TaxType> findByCountry(String country);
-    List<TaxType> findByExpirationDateBefore(LocalDate date);
-    Optional<TaxType> findByCountryAndTaxName(String country, String taxName);
 
-    Optional<TaxType> findByTaxName(String taxName);
+    List<TaxType> findByUserId(Long userId);
+
+    List<TaxType> findAllByStatus(TaxStatus taxStatus);
+
+    List<TaxType> findByUserAndStatus(UserEntity user, TaxStatus status);
+
+    Optional<Object> findByUserIdAndCategory(Long userId, TaxCategory taxCategory);
+
 }

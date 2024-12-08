@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.TaxObligation.Persistence.entity;
 
+import com.igrowker.miniproject.TaxObligation.Dto.TaxCategory;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,9 +23,6 @@ public class TaxNotificationEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user; // Relación con UserEntity
-
-    //@Column(nullable = false)
-    //private String country; // País donde se aplica el impuesto
 
     @ManyToOne
     @JoinColumn(name = "tax_type_id", nullable = false)
@@ -55,6 +53,7 @@ public class TaxNotificationEntity {
     @Column(nullable = false)
     private boolean paymentConfirmed;
 
+
     public LocalDate getLastNotifiedDate() {
         return lastNotifiedDate;
     }
@@ -63,9 +62,9 @@ public class TaxNotificationEntity {
         this.lastNotifiedDate = lastNotifiedDate;
     }
 
-
     public TaxNotificationEntity() {
     }
+
 
     // Update constructor to include TaxType
     public TaxNotificationEntity(UserEntity user, TaxType taxType) {
@@ -75,5 +74,4 @@ public class TaxNotificationEntity {
         this.isNotified = false;
         this.paymentConfirmed = false;
     }
-
 }

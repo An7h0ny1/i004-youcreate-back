@@ -1,5 +1,8 @@
 package com.igrowker.miniproject.TaxObligation.Persistence.entity;
 
+import com.igrowker.miniproject.TaxObligation.Dto.TaxCategory;
+import com.igrowker.miniproject.TaxObligation.Dto.TaxStatus;
+import com.igrowker.miniproject.User.Model.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,31 +10,55 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "tax_types")
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tax_types")
+@AllArgsConstructor
+@Builder
 public class TaxType {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String country;
+    private TaxCategory category;
 
     @Column(nullable = false)
-    private String taxName; // e.g., "Income Tax", "Sales Tax"
+    private double percentage;
 
-    @Column(nullable = false)
+    @Column(name = "expiration_date", nullable = false)
     private LocalDate expirationDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BigDecimal percentage; // e.g., 15.5% represented as 15.5
+    private TaxStatus status; // e.g., PENDING, PAID
 
-    @Column(nullable = false)
-    private BigDecimal baseAmount; // Base amount for calculation, if applicable
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
+    private double amountPaid;
+
+    private double taxDue;         // Monto a pagar (persistió)
+
+    // Getters and Setters
+    public double getTaxDue() {
+        return taxDue;
+    }
+
+    public void setTaxDue(double taxDue) {
+        this.taxDue = taxDue;
+    }
+
+    // Getters and setters
+    public void payTax(double amount) {
+        this.status = TaxStatus.PAID;
+        this.amountPaid = amount;  // Establecer el monto pagado
+    }
+
+    public double getAmountPaid() {
+        return this.amountPaid;
+    }
 }

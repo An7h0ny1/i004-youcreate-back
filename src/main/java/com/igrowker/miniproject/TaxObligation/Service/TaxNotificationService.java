@@ -1,23 +1,29 @@
 package com.igrowker.miniproject.TaxObligation.Service;
+import com.igrowker.miniproject.TaxObligation.Dto.TaxCategory;
+import com.igrowker.miniproject.TaxObligation.Dto.TaxStatus;
 import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxNotificationEntity;
 import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxType;
 import com.igrowker.miniproject.TaxObligation.Repository.TaxNotificationRepository;
 import com.igrowker.miniproject.TaxObligation.Repository.TaxTypeRepository;
+import com.igrowker.miniproject.User.Model.User;
 import com.igrowker.miniproject.User.Model.UserEntity;
+import com.igrowker.miniproject.User.Service.EmailService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
 @Service
 public class TaxNotificationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaxNotificationService.class);
 
     private final TaxNotificationRepository taxNotificationRepository;
     private final TaxNotificationEmailService taxNotificationEmailService;
@@ -31,13 +37,66 @@ public class TaxNotificationService {
         this.taxTypeRepository = taxTypeRepository;
     }
 
+    /*
+
+    public void associateTaxesForUserBasedOnCountry(UserEntity user) {
+        // Tax configurations mapped by country
+        Map<String, List<TaxType>> taxConfig = new HashMap<>();
+
+        // Example tax configurations for different countries
+        taxConfig.put("Bolivia", List.of(
+                new TaxType(TaxCategory.VAT, 13.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user),
+                new TaxType(TaxCategory.ISR, 15.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user)
+        ));
+
+        taxConfig.put("Argentina", List.of(
+                new TaxType(TaxCategory.VAT, 27.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user),
+                new TaxType(TaxCategory.ISR, 29.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user)
+        ));
+
+        taxConfig.put("Colombia", List.of(
+                new TaxType(TaxCategory.VAT, 19.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user),
+                new TaxType(TaxCategory.ISR, 25.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user)
+        ));
+
+        taxConfig.put("Dominican Republic", List.of(
+                new TaxType(TaxCategory.VAT, 18.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user),
+                new TaxType(TaxCategory.ISR, 24.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user)
+        ));
+
+        taxConfig.put("Costa Rica", List.of(
+                new TaxType(TaxCategory.VAT, 13.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user),
+                new TaxType(TaxCategory.ISR, 18.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user)
+        ));
+
+        taxConfig.put("Spain", List.of(
+                new TaxType(TaxCategory.VAT, 21.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user),
+                new TaxType(TaxCategory.ISR, 25.0, LocalDate.of(2024, 12, 9), TaxStatus.PENDING, user)
+        ));
+
+        // Fetch tax configuration for the user’s country
+        List<TaxType> userTaxes = taxConfig.get(user.getCountry());
+
+        if (userTaxes != null) {
+            // Save all tax types for the user
+            taxTypeRepository.saveAll(userTaxes);
+        } else {
+            // Log a warning or throw an exception if country is not found
+            String errorMessage = "No tax configuration found for the country: " + user.getCountry();
+            // Logging the error
+            logger.warn(errorMessage);  // Make sure you have a logger in place
+            throw new IllegalArgumentException(errorMessage);  // Optionally throw an exception
+        }
+    }
+
+
     // Updated method to create or update notifications
     @Transactional
     public void createOrUpdateTaxNotification(UserEntity user) {
-        // Fetch all tax types
-        List<TaxType> taxTypes = taxTypeRepository.findAll();
+        // Fetch all tax types associated with the user's country
+        List<TaxType> taxTypes = taxTypeRepository.findByUserCountry(user.getCountry()); // Updated to filter by user's country
         if (taxTypes.isEmpty()) {
-            throw new IllegalArgumentException("No tax types found in the system.");
+            throw new IllegalArgumentException("No tax types found for the user's country.");
         }
 
         for (TaxType taxType : taxTypes) {
@@ -60,9 +119,13 @@ public class TaxNotificationService {
                     !LocalDate.now().isBefore(taxType.getExpirationDate().minusDays(4))) {
                 if (taxNotification.getLastNotifiedDate() == null ||
                         !taxNotification.getLastNotifiedDate().equals(LocalDate.now())) {
+                    // Fetch country from UserEntity, no longer from TaxType
+                    String country = user.getCountry(); // Use the user's country directly
+
+                    // Send the notification email
                     taxNotificationEmailService.sendTaxDeadlineNotification(
                             user.getEmail(),
-                            taxType.getCountry(), // Use TaxType to get the country
+                            country, // Use the country from the UserEntity
                             taxType.getExpirationDate()
                     );
 
@@ -72,6 +135,8 @@ public class TaxNotificationService {
             }
         }
     }
+
+
 
 
     // Recibir notificaciones para un usuario
@@ -97,7 +162,7 @@ public class TaxNotificationService {
     }
 
     private LocalDate getTaxDeadlineForCountry(String country) {
-        List<TaxType> taxTypes = taxTypeRepository.findByCountry(country);
+        List<TaxType> taxTypes = taxTypeRepository.findByUserCountry(country);
         if (taxTypes.isEmpty()) {
             throw new IllegalArgumentException("No tax deadlines found for country: " + country);
         }
@@ -143,7 +208,7 @@ public class TaxNotificationService {
         });
     }
 
-     */
+
 
     @Scheduled(cron = "0 0 9 * * ?") // Runs daily at 9 a.m.
     public void notifyUsersAboutUpcomingDeadlines() {
@@ -160,10 +225,14 @@ public class TaxNotificationService {
                 if (!notification.isPaymentConfirmed() &&
                         (notification.getLastNotifiedDate() == null ||
                                 !notification.getLastNotifiedDate().equals(LocalDate.now()))) {
+                    // Fetch country from UserEntity (instead of TaxType)
+                    String country = notification.getUser().getCountry(); // Use the country from UserEntity
+
+                    // Send the notification email
                     taxNotificationEmailService.sendTaxDeadlineNotification(
                             notification.getUser().getEmail(),
-                            taxType.getCountry(), // Updated to fetch country from TaxType
-                            taxType.getExpirationDate() // Updated to fetch expiration date from TaxType
+                            country, // Use the country from the UserEntity
+                            taxType.getExpirationDate() // Get expiration date from TaxType
                     );
 
                     // Update the last notified date and save the notification
@@ -173,6 +242,7 @@ public class TaxNotificationService {
             });
         }
     }
+
 
     @Transactional
     public boolean confirmPayment(Long notificationId) {
@@ -186,4 +256,6 @@ public class TaxNotificationService {
         }
         return false;
     }
+
+     */
 }

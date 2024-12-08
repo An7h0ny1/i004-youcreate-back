@@ -7,6 +7,7 @@ import com.igrowker.miniproject.Collaborator.Model.Collaborator;
 
 import com.igrowker.miniproject.Income.Model.Income;
 import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxNotificationEntity;
+import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,9 +46,9 @@ public class UserEntity {
 
     private String role;
 
-    private String country;
-
     private String profilePhotoPath;
+
+    private String country;
 
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -55,6 +56,9 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TaxNotificationEntity> taxNotifications;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<TaxType> taxes;
 
     @Column(name = "is_enabled")
     private boolean isEnabled;
@@ -75,12 +79,6 @@ public class UserEntity {
         return verify;
     }
 
-    public String getCountry() {
-        return getCountry();
-    }
-
-    public void setCountry(String country) {
-    }
 
     /*@ManyToMany(fetch = FetchType.EAGER , targetEntity = Role.class, cascade = CascadeType.PERSIST)
     @JoinTable(name = "users_roles",
