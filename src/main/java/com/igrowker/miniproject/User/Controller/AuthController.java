@@ -7,7 +7,9 @@ import com.igrowker.miniproject.User.Dto.AuthCreateUserRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthLoginRequestDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseDto;
 import com.igrowker.miniproject.User.Dto.AuthResponseRegisterDto;
+import com.igrowker.miniproject.User.Exception.UserNotFoundException;
 import com.igrowker.miniproject.User.Model.UserEntity;
+import com.igrowker.miniproject.User.Repository.UserRepository;
 import com.igrowker.miniproject.User.Service.RegisterVerification2FAService;
 import com.igrowker.miniproject.User.Service.UserDetailsServiceImpl;
 import com.igrowker.miniproject.User.Service.UserService;
@@ -42,7 +44,7 @@ public class AuthController {
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final RegisterVerification2FAService registerVerification2FAService;
-    private final TaxNotificationService taxNotificationService;
+    private final TaxService taxService;
 
     @PostMapping("/login")
     @Tag(name = "Authentication", description = "API for user authentication.")
@@ -96,9 +98,8 @@ public class AuthController {
         AuthResponseDto response = this.userDetailsServiceImpl.loginUser(authDto);
         // Obtener los datos del usuario autenticado
         UserEntity user = userDetailsServiceImpl.getUserByEmail(authDto.getEmail());
-
-        // Activar la lógica de notificación de la fecha límite de impuestos
-        taxNotificationService.createOrUpdateTaxNotification(user);
+        // Llame al método para enviar notificaciones de impuestos relacionadas con el inicio de sesión
+        taxService.sendLoginTaxNotifications(user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -117,8 +118,14 @@ public class AuthController {
             )
     )
     public ResponseEntity<?> register(@RequestBody @Valid AuthCreateUserRequestDto authCreateUserDto) throws Exception {
+
             AuthResponseRegisterDto response = this.userDetailsServiceImpl.createUser(authCreateUserDto);
             registerVerification2FAService.sendEmailForVerification2FA(authCreateUserDto.getEmail());
+
+            // Impuestos asociados (lógica fuera del método de registro)
+            UserEntity newUser = userDetailsServiceImpl.getUserByEmail(authCreateUserDto.getEmail());
+            taxService.associateTaxesToUser(newUser);
+
             return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

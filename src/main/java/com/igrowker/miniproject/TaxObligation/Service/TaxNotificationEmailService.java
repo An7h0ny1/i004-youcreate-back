@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.TaxObligation.Service;
 
+import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxType;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -28,4 +29,21 @@ public class TaxNotificationEmailService {
             System.err.println("No se pudo enviar el correo electrónico de notificación de impuestos: " + e.getMessage());
         }
     }
+
+
+    public void sendDailyPaymentReminder(String email, TaxType tax) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Recordatorio de pago de impuestos pendientes");
+            message.setText("Estimado usuari@,\n\nTiene un pago de impuestos pendiente por " + tax.getCategory() +
+                    ". La fecha límite es " + tax.getExpirationDate() +
+                    ".\n\nPor favor realice el pago lo antes posible.\n\nAtentamente,\nEquipo de Sistema Tributario");
+            mailSender.send(message);
+            System.out.println("Recordatorio de pago diario enviado a " + email);
+        } catch (Exception e) {
+            System.err.println("No se pudo enviar el correo electrónico de recordatorio de pago: " + e.getMessage());
+        }
+    }
+
 }
