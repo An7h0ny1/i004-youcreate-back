@@ -2,6 +2,8 @@ package com.igrowker.miniproject.User.Model;
 
 import java.time.LocalDateTime;
 
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.lang.Nullable;
 
 import jakarta.persistence.Column;
@@ -10,20 +12,21 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.Setter;
 
 @Entity
-@Data
+@Getter
 @Setter
-@Table(name = "2FARegister")
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "FARegister")
 public class RegisterVerification2FA{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token")
+    @Column(name = "token", length = 512)
     private String token;
 
     @Column(name = "email")

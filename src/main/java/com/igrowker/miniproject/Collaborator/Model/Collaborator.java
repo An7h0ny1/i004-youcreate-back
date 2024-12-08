@@ -1,6 +1,7 @@
 package com.igrowker.miniproject.Collaborator.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.igrowker.miniproject.Payment.Model.Payment;
 import com.igrowker.miniproject.User.Model.UserEntity;
 
 import jakarta.persistence.Column;
@@ -37,10 +38,15 @@ public class Collaborator {
     @NotNull(message = "Amount is required")
     @Column(name = "amount")
     private Double amount;
-
+    
+    @NotNull(message = "Date is required")
+    @Column(name = "date")
+    private String date;
+    
     @NotNull(message = "User is required")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private UserEntity user;
+
 }

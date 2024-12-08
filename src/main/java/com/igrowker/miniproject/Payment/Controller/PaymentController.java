@@ -1,6 +1,12 @@
-package com.igrowker.miniproject.Payment;
+package com.igrowker.miniproject.Payment.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.igrowker.miniproject.Payment.DTO.PaymentDTO;
+
+import com.igrowker.miniproject.Payment.Model.Payment;
+import com.igrowker.miniproject.Payment.Model.PaymentStatus;
+import com.igrowker.miniproject.Payment.Service.IPaymentService;
 import com.igrowker.miniproject.Utils.Api_Response;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +37,7 @@ public class PaymentController {
 
     @Autowired
     private IPaymentService paymentService;
+
     
     @GetMapping("")
     @Tag(name = "Payment", description = "API for get payments")
@@ -42,7 +49,7 @@ public class PaymentController {
     })
     public ResponseEntity<List<Payment>> getAllPayments() {
         List<Payment> payments = paymentService.getAllPayments();
-        return (paymentService.getAllPayments().isEmpty()) ? ResponseEntity.ok(payments): ResponseEntity.noContent().build();
+        return (!paymentService.getAllPayments().isEmpty()) ? ResponseEntity.ok(payments): ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -58,6 +65,23 @@ public class PaymentController {
         return ResponseEntity.ok(new Api_Response<>(payment, "pago encontrado con exito!", 200));
     }
 
+    @GetMapping("/collaborator/{id}")
+    @Tag(name = "Payment", description = "API for get payments")
+    @Operation(summary = "Get payment by id collaborator", description = "Get payment data by id collaborator.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "404", description = "pago no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
+        @ApiResponse(responseCode = "400", description = "bad request error")
+    })
+    public ResponseEntity<Api_Response<List<Payment>>> getPaymentByIdCollaborator(@PathVariable @Valid Long id) throws Exception{
+        List<Payment> payments = paymentService.getPaymentsByIdCollaborator(id);
+
+        if (payments == null) {
+            ResponseEntity.ok("No hay pagos encontrados");
+        }
+        return ResponseEntity.ok(new Api_Response<>(payments, "pagos encontrados con exito!", 200));
+    }
+
     @GetMapping("/status/{status}")
     @Tag(name = "Payment", description = "API for get payments")
     @Operation(summary = "Get payments status", description = "Get payments data by status.")
@@ -66,7 +90,7 @@ public class PaymentController {
         @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
         @ApiResponse(responseCode = "400", description = "bad request error en obtener los estados")
     })
-    public ResponseEntity<Api_Response<List<Payment>>>  getPaymentBystatus(@RequestParam PaymentStatus status) throws Exception {
+    public ResponseEntity<Api_Response<List<Payment>>>  getPaymentBystatus(@RequestParam @Valid PaymentStatus status) throws Exception {
         List<Payment> payments = paymentService.getPaymentsByStatus(status);
         return ResponseEntity.ok(new Api_Response<>(payments, "pagos encontrados con exito!", 200));
     }
@@ -118,7 +142,7 @@ public class PaymentController {
         @ApiResponse(responseCode = "400", description = "bad request, el pago es invalido"),
         @ApiResponse(responseCode = "200", description = "ok! Se crea el nuevo pago")
     })
-    public  ResponseEntity<?>  CreatePayment(@RequestBody @Valid Payment payment) throws Exception {
+    public  ResponseEntity<?>  CreatePayment(@RequestBody @Valid PaymentDTO payment) throws Exception {
         paymentService.createPayment(payment);
         return ResponseEntity.ok(payment);
     }
@@ -132,8 +156,22 @@ public class PaymentController {
         @ApiResponse(responseCode = "200", description = "ok! Se edito el pago correctamente"),
         @ApiResponse(responseCode = "404", description = "pago no encontrado"),
     })
-    public ResponseEntity<?> editPayment(@PathVariable Long id, @RequestBody Payment payment) throws Exception{
+    public ResponseEntity<?> editPayment(@PathVariable Long id, @RequestBody @Valid Payment payment) throws Exception{
         paymentService.editPayment(id, payment);
+        return ResponseEntity.ok(payment);
+    }
+
+    @PutMapping("pay/{id}")
+    @Tag(name = "Payment", description = "API for get payments")
+    @Operation(summary = "pay a debt", description = "You can pay a debt")
+    @ApiResponses({
+        @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
+        @ApiResponse(responseCode = "400", description = "bad request, el pago es invalido"),
+        @ApiResponse(responseCode = "200", description = "ok! Se edito el pago correctamente"),
+        @ApiResponse(responseCode = "404", description = "pago no encontrado"),
+    })
+    public ResponseEntity<?> pay(@PathVariable Long id) throws Exception{
+        Payment payment = paymentService.pay(id);
         return ResponseEntity.ok(payment);
     }
 
@@ -150,7 +188,19 @@ public class PaymentController {
         paymentService.deletePaymentById(id);
         return ResponseEntity.ok("Eliminacion correcta!");
     }
-    
+     
+    @GetMapping("/Expiring")
+    @Tag(name = "Payment", description = "API for get payments")
+    @Operation(summary = "get payments for expiring", description = "You can get payments for expiring")
+    @ApiResponses({
+        @ApiResponse(responseCode = "500", description = "Error interno en el servidor"),
+        @ApiResponse(responseCode = "200", description = "ok! Se elimino el pago correctamente"),
+        @ApiResponse(responseCode = "404", description = "pagos no encontrado"),
+    })
+    public ResponseEntity<?> getPaymentsAboutToExpire() {
+        return ResponseEntity.ok(paymentService.getPaymentsForReminder(0));
+    }
+
 
     
     

@@ -1,5 +1,6 @@
 package com.igrowker.miniproject.User.Service;
 
+import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
 
@@ -59,5 +60,7 @@ public class EmailService {
         return UUID.randomUUID();
     }
 
-    
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 }
