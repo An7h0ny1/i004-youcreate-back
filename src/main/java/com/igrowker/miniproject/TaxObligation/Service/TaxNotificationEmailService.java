@@ -1,7 +1,6 @@
 package com.igrowker.miniproject.TaxObligation.Service;
 
 import com.igrowker.miniproject.TaxObligation.Persistence.entity.TaxType;
-import com.igrowker.miniproject.User.Model.UserEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -16,39 +15,6 @@ public class TaxNotificationEmailService {
     public TaxNotificationEmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
-    /*
-    public void sendTaxDeadlineNotification(String email, String country, LocalDate deadline) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(email);
-            message.setSubject("Próxima fecha límite de impuestos");
-            message.setText("Hola Estimado Usuario,\n\nTenga en cuenta que la fecha límite de impuestos para "
-                    + country + " se acerca " + deadline + ".\n\nQue tenga Buen Dia!");
-            mailSender.send(message);
-            System.out.println("Correo electrónico de notificación de impuestos enviado a " + email);
-        } catch (Exception e) {
-            System.err.println("No se pudo enviar el correo electrónico de notificación de impuestos: " + e.getMessage());
-        }
-    }
-
-     */
-    /*
-
-    public void sendTaxDeadlineNotification(String email, UserEntity user, LocalDate deadline) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(email);
-            message.setSubject("Tax Deadline Reminder");
-            message.setText("Dear User,\n\nPlease note that the tax deadline for " + user.getCountry() +
-                    " is approaching on " + deadline + ".\n\nKind regards,\nTax System Team");
-            mailSender.send(message);
-            System.out.println("Tax notification email sent to " + email);
-        } catch (Exception e) {
-            System.err.println("Failed to send tax notification email: " + e.getMessage());
-        }
-    }
-
-     */
 
     public void sendTaxDeadlineNotification(String email, String country, LocalDate deadline) {
         try {

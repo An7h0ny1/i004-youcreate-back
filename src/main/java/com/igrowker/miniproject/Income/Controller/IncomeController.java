@@ -1,6 +1,5 @@
 package com.igrowker.miniproject.Income.Controller;
 
-import com.igrowker.miniproject.Collaborator.Service.CollaboratorService;
 import com.igrowker.miniproject.Income.DTO.IncomeCreateRequestDTO;
 import com.igrowker.miniproject.Income.DTO.IncomeEntityResponseDTO;
 import com.igrowker.miniproject.Income.DTO.IncomeUpdateRequestDTO;
@@ -11,20 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-<<<<<<< HEAD
-import java.util.HashMap;
-=======
 import java.math.BigDecimal;
->>>>>>> origin/develop
 import java.util.List;
-import java.util.Map;
 
 @RestController
 

@@ -6,7 +6,6 @@ import com.igrowker.miniproject.User.Model.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity

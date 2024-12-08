@@ -1,12 +1,9 @@
 package com.igrowker.miniproject.TaxObligation.Persistence.entity;
-
-import com.igrowker.miniproject.TaxObligation.Dto.TaxCategory;
 import com.igrowker.miniproject.User.Model.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Getter
@@ -37,18 +34,6 @@ public class TaxNotificationEntity {
     @Column(nullable = true)
     private LocalDate lastNotifiedDate;
 
-    /*
-    private boolean isPaymentConfirmed = false;
-
-    public boolean isPaymentConfirmed() {
-        return isPaymentConfirmed;
-    }
-
-    public void setPaymentConfirmed(boolean paymentConfirmed) {
-        isPaymentConfirmed = paymentConfirmed;
-    }
-
-     */
 
     @Column(nullable = false)
     private boolean paymentConfirmed;
