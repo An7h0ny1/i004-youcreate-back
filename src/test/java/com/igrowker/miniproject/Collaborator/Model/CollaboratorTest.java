@@ -30,6 +30,7 @@ public class CollaboratorTest {
                 .id(1L)
                 .name("John Doe")
                 .service("CEO")
+                .date("2021-09-01")
                 .amount(500D)
                 .user(user)
                 .build();
@@ -39,6 +40,7 @@ public class CollaboratorTest {
         assertEquals(1L, collaborator.getId());
         assertEquals("John Doe", collaborator.getName());
         assertEquals("CEO", collaborator.getService());
+        assertEquals("2021-09-01", collaborator.getDate());
         assertEquals(500D, collaborator.getAmount());
         assertEquals(1L, user.getId());
     }

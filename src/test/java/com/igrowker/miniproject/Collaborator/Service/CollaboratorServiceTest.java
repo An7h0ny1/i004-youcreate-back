@@ -46,6 +46,7 @@ class CollaboratorServiceTest {
                 .id(1L)
                 .name("John Doe")
                 .service("Cleaning")
+                .date("2021-09-01")
                 .amount(200.0)
                 .user(user)
                 .build();
@@ -54,6 +55,7 @@ class CollaboratorServiceTest {
                 .id(2L)
                 .name("Jane Smith")
                 .service("Cooking")
+                .date("2021-09-01")
                 .amount(150.0)
                 .user(user)
                 .build();
@@ -70,9 +72,11 @@ class CollaboratorServiceTest {
         assertEquals("John Doe", result.get(0).name());
         assertEquals("Cleaning", result.get(0).service());
         assertEquals(200.0, result.get(0).amount());
+        assertEquals("2021-09-01", result.get(0).date());
         assertEquals("Jane Smith", result.get(1).name());
         assertEquals("Cooking", result.get(1).service());
         assertEquals(150.0, result.get(1).amount());
+        assertEquals("2021-09-01", result.get(1).date());
     }
 
     @Test
@@ -97,6 +101,7 @@ class CollaboratorServiceTest {
                 .id(collaboratorId)
                 .name("John Doe")
                 .service("Cleaning")
+                .date("2021-09-01")
                 .amount(200.0)
                 .user(UserEntity.builder().id(1L).build())
                 .build();
@@ -110,6 +115,7 @@ class CollaboratorServiceTest {
         assertNotNull(result);
         assertEquals("John Doe", result.name());
         assertEquals("Cleaning", result.service());
+        assertEquals("2021-09-01", result.date());
         assertEquals(200.0, result.amount());
     }
 
@@ -139,6 +145,7 @@ class CollaboratorServiceTest {
                 .name("John Doe")
                 .service("Cleaning")
                 .amount(200.0)
+                .date("2021-09-01")
                 .user(user)
                 .build();
 
@@ -149,6 +156,7 @@ class CollaboratorServiceTest {
                 .name("John Doe")
                 .service("Cleaning")
                 .amount(200.0)
+                .date("2021-09-01")
                 .user_id(userId)
                 .build();
         // When
@@ -158,6 +166,7 @@ class CollaboratorServiceTest {
         assertNotNull(result);
         assertEquals("John Doe", result.name());
         assertEquals("Cleaning", result.service());
+        assertEquals("2021-09-01", result.date());
         assertEquals(200.0, result.amount());
     }
 
@@ -170,6 +179,7 @@ class CollaboratorServiceTest {
                 .name("John Doe")
                 .service("Cleaning")
                 .amount(200.0)
+                .date("2021-09-01")
                 .user(UserEntity.builder().id(1L).build())
                 .build();
 
@@ -178,6 +188,7 @@ class CollaboratorServiceTest {
                 .name("John Doe")
                 .service("Cleaning")
                 .amount(200.0)
+                .date("2021-09-01")
                 .user_id(1L)
                 .build();
 
@@ -196,6 +207,7 @@ class CollaboratorServiceTest {
                 .name("John Doe")
                 .service("Cleaning")
                 .amount(200.0)
+                .date("2021-09-01")
                 .user(UserEntity.builder().id(1L).build())
                 .build();
 
@@ -204,6 +216,7 @@ class CollaboratorServiceTest {
                 .name("Jane Smith")
                 .service("Cooking")
                 .amount(150.0)
+                .date("2021-09-01")
                 .user(UserEntity.builder().id(1L).build())
                 .build();
 
@@ -213,6 +226,7 @@ class CollaboratorServiceTest {
         CollaboratorUpdateRequestDTO collaboratorUpdateRequestDTO = CollaboratorUpdateRequestDTO.builder()
                 .name("Jane Smith")
                 .service("Cooking")
+                .date("2021-09-01")
                 .amount(150.0)
                 .build();
         // When
@@ -223,6 +237,7 @@ class CollaboratorServiceTest {
         assertNotNull(result);
         assertEquals("Jane Smith", result.name());
         assertEquals("Cooking", result.service());
+        assertEquals("2021-09-01", result.date());
         assertEquals(150.0, result.amount());
     }
 
@@ -236,6 +251,7 @@ class CollaboratorServiceTest {
                 .id(collaboratorId)
                 .name("Jane Smith")
                 .service("Cooking")
+                .date("2021-09-01")
                 .amount(150.0)
                 .user(UserEntity.builder().id(1L).build())
                 .build();
@@ -244,6 +260,7 @@ class CollaboratorServiceTest {
         CollaboratorUpdateRequestDTO collaboratorUpdateRequestDTO = CollaboratorUpdateRequestDTO.builder()
                 .name("Jane Smith")
                 .service("Cooking")
+                .date("2021-09-01")
                 .amount(150.0)
                 .build();
 
@@ -261,6 +278,7 @@ class CollaboratorServiceTest {
                 .id(collaboratorId)
                 .name("John Doe")
                 .service("Cleaning")
+                .date("2021-09-01")
                 .amount(200.0)
                 .user(UserEntity.builder().id(1L).build())
                 .build();
@@ -294,6 +312,7 @@ class CollaboratorServiceTest {
                 .id(1L)
                 .name("John Doe")
                 .service("Cleaning")
+                .date("2021-09-01")
                 .amount(200.0)
                 .user(UserEntity.builder().id(1L).build())
                 .build();
@@ -305,6 +324,7 @@ class CollaboratorServiceTest {
         assertNotNull(result);
         assertEquals("John Doe", result.name());
         assertEquals("Cleaning", result.service());
+        assertEquals("2021-09-01", result.date());
         assertEquals(200.0, result.amount());
     }
 }
