@@ -37,6 +37,20 @@ YouCreate es una plataforma fintech diseñada para ayudar a los creadores de con
 
 ---
 
+## 🔄 Integración y Despliegue Continuo (CI/CD)
+
+Este proyecto utiliza GitHub Actions para automatizar el proceso de integración y despliegue continuo del backend.
+
+Cada vez que se realiza un push o pull request en la rama develop, se ejecuta un flujo que:
+
+- Compila el proyecto con Maven usando JDK 17.
+- Construye y publica una imagen Docker en Docker Hub.
+- Ejecuta el despliegue de forma automática, manteniendo el backend actualizado con los últimos cambios.
+  
+Esta automatización simplifica el proceso, ejecutándolo de forma consistente en cada cambio.
+
+---
+
 ## 🛠️ ¿Qué Aporta el Backend?
 - Desarrollo de la lógica del negocio y APIs RESTful.
 - Conexión entre el frontend y la base de datos.
