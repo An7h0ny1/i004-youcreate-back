@@ -54,27 +54,27 @@ public class TaxService {
 
     private static final Map<String, List<TaxType>> TAX_CONFIG = Map.of(
             "Bolivia", List.of(
-                    new TaxType(null, TaxCategory.VAT, 13.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
+                    new TaxType(null, TaxCategory.IVA, 13.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
                     new TaxType(null, TaxCategory.ISR, 15.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0)
             ),
             "Argentina", List.of(
-                    new TaxType(null, TaxCategory.VAT, 27.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
+                    new TaxType(null, TaxCategory.IVA, 27.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
                     new TaxType(null, TaxCategory.ISR, 29.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0)
             ),
             "Colombia", List.of(
-                    new TaxType(null, TaxCategory.VAT, 19.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
+                    new TaxType(null, TaxCategory.IVA, 19.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
                     new TaxType(null, TaxCategory.ISR, 25.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0)
             ),
             "Dominican Republic", List.of(
-                    new TaxType(null, TaxCategory.VAT, 18.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
+                    new TaxType(null, TaxCategory.IVA, 18.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
                     new TaxType(null, TaxCategory.ISR, 24.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0)
             ),
             "Costa Rica", List.of(
-                    new TaxType(null, TaxCategory.VAT, 13.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
+                    new TaxType(null, TaxCategory.IVA, 13.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
                     new TaxType(null, TaxCategory.ISR, 18.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0)
             ),
             "Spain", List.of(
-                    new TaxType(null, TaxCategory.VAT, 21.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
+                    new TaxType(null, TaxCategory.IVA, 21.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0),
                     new TaxType(null, TaxCategory.ISR, 25.0, LocalDate.of(2024, 12, 12), TaxStatus.PENDING, null, 0.0, 0.0)
             )
             // Agregue los países restantes aquí
@@ -236,7 +236,7 @@ public class TaxService {
     }
 
     public void payVAT(Long userId) {
-        paySpecificTax(userId, TaxCategory.VAT);
+        paySpecificTax(userId, TaxCategory.IVA);
     }
 
     public void payISR(Long userId) {
@@ -320,6 +320,17 @@ public class TaxService {
         return taxes.stream()
                 .filter(tax -> tax.getStatus().equalsIgnoreCase("PAID"))
                 .mapToDouble(TaxDTO::getAmountPaid)
+                .sum();
+    }
+
+    public double calculateTotalDebts(Long userId) {
+        // Obtener todos los impuestos para el usuario.
+        List<TaxDTO> taxes = getTaxesForUser(userId);
+
+        // Calcular la suma del monto pagado por impuestos con estado "PAID"
+        return taxes.stream()
+                .filter(tax -> tax.getStatus().equalsIgnoreCase("PENDING"))
+                .mapToDouble(TaxDTO::getTaxDue)
                 .sum();
     }
 

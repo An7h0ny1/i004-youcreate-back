@@ -17,17 +17,13 @@ import java.util.List;
 @RequestMapping("/api/v1/taxes")
 public class TaxController {
 
-
     private final TaxService taxService;
-    private final TaxNotificationService taxNotificationService;
     private final UserRepository userRepository;
 
-    public TaxController(TaxService taxService, TaxNotificationService taxNotificationService, UserRepository userRepository) {
+    public TaxController(TaxService taxService, UserRepository userRepository) {
         this.taxService = taxService;
-        this.taxNotificationService = taxNotificationService;
         this.userRepository = userRepository;
     }
-
 
     @Operation(
             summary = "Obtiene todos los impuestos y estados por usuario",
@@ -84,7 +80,7 @@ public class TaxController {
     @PostMapping("/pay-vat")
     public ResponseEntity<String> payVAT(@RequestParam Long userId) {
         try {
-            taxService.paySpecificTax(userId, TaxCategory.VAT);
+            taxService.paySpecificTax(userId, TaxCategory.IVA);
             return ResponseEntity.ok("Impuesto IVA pagado exitosamente.");
         } catch (IllegalStateException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -126,5 +122,16 @@ public class TaxController {
     public ResponseEntity<String> getTotalPayments(@RequestParam Long userId) {
         double totalPayments = taxService.calculateTotalPayments(userId);
         return ResponseEntity.ok("Pagos totales realizados: " + totalPayments);
+    }
+
+    @Operation(
+            summary = "Obtiene el total de deuda de los impuestos IVA + ISR",
+            description = "Muestra el monto total de deuda de impuestos"
+    )
+    @ApiResponse(responseCode = "200", description = "Total de deuda de Impuestos calculados correctamente.")
+    @GetMapping("/total-debts")
+    public ResponseEntity<String> getTotalDebts(@RequestParam Long userId) {
+        double totalDebts = taxService.calculateTotalDebts(userId);
+        return ResponseEntity.ok("Pagos totales realizados: " + totalDebts);
     }
 }
